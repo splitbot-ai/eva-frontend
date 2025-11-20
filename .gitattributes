@@ -1,0 +1,7 @@
+wwwroot/* linguist-vendored
+obj/* linguist-vendored
+bin/* linguist-vendored
+*.ftl linguist-detectable=false
+*.fluent linguist-detectable=false
+*.razor linguist-language=C#
+
