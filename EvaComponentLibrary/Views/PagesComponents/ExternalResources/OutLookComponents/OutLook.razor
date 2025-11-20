@@ -1,0 +1,131 @@
+﻿@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using EvaComponentLibrary.ViewModels;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject OutLookViewModel _ovm;
+<div class="main outlook-container">
+	<div class="  outlook-content-container">
+		<div class="info-btn">
+			<MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty : "hide-the-info-buttons")" />
+		</div>
+
+		@if (string.IsNullOrEmpty(_ovm.Account.Email))
+		{
+			<EditForm Model="@AuthData" OnValidSubmit="OnValidSubmit">
+				<DataAnnotationsValidator />
+				<MudGrid>
+					<MudItem xs="12" sm="7">
+						<MudCard>
+							<MudCardContent>
+								<MudTextField Label="Username" Class="mt-3"
+											  @bind-Value="AuthData.UserName" For="@(() => AuthData.UserName)" InputType="InputType.Text" autocomplete="off" Immediate="true" />
+								<MudTextField Label="@_locals["_pass"]" Class="mt-3"
+											  @bind-Value="AuthData.Password" For="@(() => AuthData.Password)" InputType="@PasswordInput" autocomplete="off" Immediate="true" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" />
+							</MudCardContent>
+							<MudCardActions>
+								<MudButton Disabled="@(string.IsNullOrEmpty(AuthData.Password) || string.IsNullOrEmpty(AuthData.UserName) ? true : false)" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@_locals["_connect"]</MudButton>
+							</MudCardActions>
+						</MudCard>
+					</MudItem>
+				</MudGrid>
+			</EditForm>
+		}
+		else
+		{
+			<div class="account-container">
+				<div class="email">
+					<p>@_ovm.Account.Email</p>
+				</div>
+				<div class="delete-btn">
+					<MudIconButton Class="del-btn"
+								   OnClick="DeleteKalenderAuth"
+								   Icon="@Icons.Material.Filled.Delete">
+					</MudIconButton>
+				</div>
+			</div>
+		}
+		<MudItem xs="12">
+			<MudText Typo="Typo.body2" Align="Align.Center" Color="@_messageColor">
+				@_locals[_alertMessage]
+			</MudText>
+		</MudItem>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string SubTab { get; set; }
+	public OutLookAuth AuthData { get; set; }
+	private string _alertMessage = string.Empty;
+	private Color _messageColor;
+	private bool _isShow;
+	InputType PasswordInput = InputType.Password;
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	protected override async void OnInitialized()
+	{
+
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		AuthData = new();
+	}
+	private async Task OnValidSubmit(EditContext context)
+	{
+		var result = await _ovm.PostAuthOutLook(AuthData);
+		//(result);
+		(_messageColor, _alertMessage, AuthData.Password, AuthData.UserName) = result switch
+		{
+			"OK" => (Color.Success, "_addOutLook", string.Empty, string.Empty),
+			string re when re.Contains("Unauthorized") => (Color.Error, "_incorrectCredentials", AuthData.Password, AuthData.UserName),
+			_ => (Color.Error, "_genError", AuthData.Password, AuthData.UserName)
+		};
+
+		update();
+		await Task.Delay(2000);
+		_alertMessage = string.Empty;
+	}
+	private async Task DeleteKalenderAuth()
+	{
+		var result = await _ovm.DeleteKalenderAuth();
+		(_messageColor, _alertMessage) = result switch
+		{
+			bool re when re.Equals(true) => (Color.Success, string.Format(_locals["_deletedSucc"], _ovm.Account.Email)),
+			_ => (Color.Error, "_genError"),
+		};
+		await Task.Delay(2000);
+		_alertMessage = string.Empty;
+		update();
+	}
+	void ButtonTestclick()
+	{
+		@if (_isShow)
+		{
+			_isShow = false;
+			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+			PasswordInput = InputType.Password;
+		}
+		else
+		{
+			_isShow = true;
+			PasswordInputIcon = Icons.Material.Filled.Visibility;
+			PasswordInput = InputType.Text;
+		}
+	}
+	private void InfoUploadDialog()
+	{
+		_lg.InfoMessage_1 = _locals["_outlook"];
+		_lg.InfoMessage_2 = string.Empty;
+		_lg.OnInfoModalToggle = true;
+		_lg.UpdateInfoModal?.Invoke();
+	}
+	public async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+}

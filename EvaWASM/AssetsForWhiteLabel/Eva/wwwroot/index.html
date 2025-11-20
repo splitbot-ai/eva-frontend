@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"  >
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eva</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="manifest.webmanifest?v=2" rel="manifest" />
+
+
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="_content/MudBlazor.Markdown/MudBlazor.Markdown.min.css" rel="stylesheet" />
+    <link href="_content/EvaComponentLibrary/css/app.css"  rel="stylesheet" />
+    <link rel="stylesheet" href="../css/app.css" />
+    <link href="EvaWASM.styles.css" rel="stylesheet" />
+    <!--<link href="EvaComponentLibrary.styles.css" rel="stylesheet" />-->
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+</head>
+
+<body>
+    <div id="app">
+        <!--<svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>-->
+    </div>
+
+    <div id="blazor-error-ui">
+        😭 This should not have happend. Please press [cmd] + [F5] or [strg] + [F5].
+        If this happens again, please contact
+        <a href="mailto:support@splitbot.de" class="reload">support@splitbot.de</a>
+    </div>
+
+    <script src="_content/Solutaris.InfoWARE.ProtectedBrowserStorage/config.js"></script>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_content/MudBlazor.Markdown/MudBlazor.Markdown.min.js"></script>
+    <script>
+        navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' });
+    </script>
+    <script src="_content/EvaComponentLibrary/js/chat.js?v=2.0"></script>
+
+</body>
+
+</html>

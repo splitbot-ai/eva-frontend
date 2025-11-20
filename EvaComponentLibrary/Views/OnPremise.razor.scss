@@ -1,0 +1,105 @@
+﻿@import "styles/light-dark.scss";
+
+.main-container {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+
+    .img-container {
+        width: 250px;
+
+        img {
+            filter: var(--invert100-img);
+        }
+    }
+
+    .form-container {
+        width: 600px;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+
+        .input-container {
+            width: 100%;
+            max-width: 340px;
+            height: 390px;
+            height: 390px;
+            overflow-y: auto;
+            padding: 5px;
+
+            .input-tooltip {
+                display: flex;
+                align-items: center;
+                margin: 30px 0;
+
+                ::deep .mud-tooltip-inline {
+                    width: 330px;
+                }
+
+                ::deep .mud-svg-icon {
+                    fill: currentColor;
+                    color: var(--highlight-color);
+                }
+
+                ::deep .mud-input-control {
+                    /*margin-bottom: 25px;*/
+                }
+
+                ::deep .mud-input-outlined-border {
+                    border-radius: 30px !important;
+                    border: 2px solid var(--highlight-color) !important;
+                }
+
+                ::deep .mud-input-label-outlined {
+                    background-color: var(--background-color);
+                    color: var(--highlight-color) !important;
+                }
+
+                ::deep .mud-input input {
+                    color: var(--text-color);
+                }
+
+                ::deep .mud-list-item {
+                    background-color: var(--background-color);
+                }
+            }
+        }
+
+        .go-back {
+            width: 340px;
+
+
+            a {
+                text-align: left;
+                color: var(--text-color);
+            }
+
+            ::deep .mud-ripple-icon {
+                padding:10px 2px;
+            }
+
+            ::deep .mud-icon-size-medium {
+                color: var(--text-color) !important;
+            }
+        }
+
+        ::deep .mud-button-outlined {
+            font-weight: 600;
+            height: 56px;
+            width: 340px;
+            border-radius: 30px !important;
+            color: white;
+            border: 2px solid var(--highlight-color) !important;
+            background-color: var(--highlight-color);
+        }
+    }
+}

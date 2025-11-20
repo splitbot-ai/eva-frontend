@@ -1,0 +1,194 @@
+﻿﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@using System.Collections.Immutable;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class="modal @(_open ? "open" : string.Empty) main">
+	<div @onclick="Toggle" class="backdrop-container"></div>
+	<div class="modal-body">
+		<div class="modal-head">
+			<MudButton OnClick="Toggle">
+				<MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
+				<h3>Feedback geben</h3>
+			</MudButton>
+		</div>
+		<div class="modal-content">
+			<MudChipSet @bind-SelectedValues="_selected" SelectionMode="SelectionMode.MultiSelection">
+				@for (int i = 0; i < _included.Length; i++)
+				{
+					var index = i;
+					<MudChip Value="@_ingredients[index]" @bind-Selected="_included[index]" Color="Color.Primary" Variant="@Variant.Text" />
+				}
+			</MudChipSet>
+			<MudTextField T="string" Placeholder="@(_locals["_specAnswer"])" 
+			@bind-Value="_message" Underline="false" Variant="Variant.Filled" Lines="10" />
+		</div>
+		<div class="modal-foot ">
+			<MudButton OnClick="Toggle" Variant="Variant.Filled">@_locals["_cancel"]</MudButton>
+			<MudButton OnClick="TryToSave" Variant="Variant.Filled" Color="Color.Primary">@_locals["_save"]</MudButton>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public bool Open
+	{
+		get { return _open; }
+		set
+		{
+			_ingredients = new string[5];
+			if (_ingredients.Length >= 5)
+			{
+				_ingredients[0] = _locals["_wrongAnswer"];
+				_ingredients[1] = _locals["_wrongSource"];
+				_ingredients[2] = _locals["_wrongAnswerToQuestion"];
+				_ingredients[3] = _locals["_answerToLong"];
+				_ingredients[4] = _locals["_answerTooShort"];
+			}
+			_open = value;
+		}
+	}
+
+	private bool _open;
+
+
+
+	[Parameter]
+	public Message Msg { get; set; }
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+	// [Parameter]
+	// public bool HideInfo { get; set; }
+	private string[] _ingredients = ["Falsche Antwort", "Falsche Quellen",
+	"Frage nicht korrekt beantwortet", "Antwort zu lang", "Antwort zu kurz"];
+	private string? _message { get; set; } = string.Empty;
+	private IReadOnlyCollection<string> _selected = new List<string>().AsReadOnly();
+	private bool[] _included = new bool[5];
+	private void Toggle()
+	{
+		_open = !_open;
+		OnClose.InvokeAsync(_open);
+		_message = string.Empty;
+	}
+	private async Task TryToSave()
+	{
+		if (string.IsNullOrEmpty(_message) && _selected.Count.Equals(0))
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_fillAll"], Severity.Warning, config =>
+			{
+				config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				config.VisibleStateDuration = 1000;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+			
+			return;
+		};
+
+		string feedback = string.Empty;
+		if (_selected != null)
+		{
+			foreach (var sel in _selected)
+			{
+				feedback += $"{sel} ++++";
+			}
+		}
+
+		feedback += $"\nNachricht:{_message}";
+
+		bool result = await _vm.PostFeedbackAsync(Msg.Id, -1, feedback);
+
+		if (result)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_feedback"], Severity.Success, config =>
+			{
+				config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				config.VisibleStateDuration = 3000;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+
+			Toggle();
+			SubmitDislike();
+		}
+		else
+		{
+			Alert(false);
+		}
+
+		_selected = ImmutableArray<string>.Empty;
+		_message = string.Empty;
+		Array.Clear(_included, 0, _included.Length);
+	}
+	private async void SubmitDislike()
+	{
+		Msg.Feedback = Feedback.Dislike;
+		_lg.UpdateFeedBack?.Invoke();
+	}
+	private void Alert(bool? error)
+	{
+		if (error is null)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_renameWarn"], Severity.Warning, config =>
+			{
+				config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				config.VisibleStateDuration = 3000;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else if (error is false)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+			{
+				config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+				config.VisibleStateDuration = 3000;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+	CultureInfo[] cultures = new[]
+	{
+		new CultureInfo("en-US"),
+		new CultureInfo("de-DE")
+	};
+
+	CultureInfo Culture
+	{
+		get => CultureInfo.CurrentCulture;
+		set
+		{
+			if (CultureInfo.CurrentCulture != value)
+			{
+				Thread.CurrentThread.CurrentCulture = value;
+				Thread.CurrentThread.CurrentUICulture = value;
+
+				CultureInfo.DefaultThreadCurrentCulture = value;
+				CultureInfo.DefaultThreadCurrentUICulture = value;
+			}
+		}
+	}
+}
+

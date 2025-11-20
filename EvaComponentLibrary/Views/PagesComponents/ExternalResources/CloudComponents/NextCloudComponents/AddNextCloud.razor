@@ -1,0 +1,118 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.CloudBase.NextCloud;
+@using EvaComponentLibrary.ViewModels
+@using EvaComponentLibrary.ViewModels.Cloud
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject NextCloudViewModel _nvm;
+@inject NavigationManager _navigationManager;
+@inject ISnackbar Snackbar;
+
+<div class=" mian content">
+    <div class="nextcloud-content-container ">
+        <EditForm Model="@NextCloudAuthentication" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="7">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudTextField Label="Host"
+                                          @bind-Value="NextCloudAuthentication.Url" For="@(() => NextCloudAuthentication.Url)" autocomplete="off" Immediate="true" />
+                           
+                            <MudTextField Label="Username" Class="mt-3"
+                                          @bind-Value="NextCloudAuthentication.UserName" For="@(() => NextCloudAuthentication.UserName)" InputType="InputType.Text" autocomplete="off" Immediate="true" />
+                            <MudTextField Label="@_locals["_pass"]" Class="mt-3"
+                                          @bind-Value="NextCloudAuthentication.Password" For="@(() => NextCloudAuthentication.Password)" InputType="@PasswordInput" autocomplete="off" Immediate="true" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" />
+                        </MudCardContent>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.body2" Align="Align.Center" Color="@_messageColor">
+                                @_locals[_alertMessage]
+                            </MudText>
+                        </MudItem>
+                        <MudCardActions>
+                            <MudButton OnClick="GoBack" Variant="Variant.Filled" Color="Color.Default" Class="ml-auto">@_locals["_cancel"]</MudButton>
+                            <MudButton Disabled="@(string.IsNullOrEmpty(NextCloudAuthentication.Url) || string.IsNullOrEmpty(NextCloudAuthentication.UserName) || string.IsNullOrEmpty(NextCloudAuthentication.Password) ? true : false)" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@_locals["_connect"]</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public string SubTab { get; set; }
+    private string _link = string.Empty;
+    private string _pass = string.Empty;
+    private bool _isSending = false;
+    private bool _busy = false;
+    private string _alertMessage = string.Empty;
+    private Color _messageColor;
+    private bool _isShow;
+    private NextCloudAccountRegistration NextCloudAuthentication;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+        NextCloudAuthentication = new();
+    }
+    private async Task OnValidSubmit(EditContext context)
+    {
+        var result = await _nvm.PostNextcloudAccountAsync(NextCloudAuthentication);
+        if (result.Equals("OK"))
+        {
+            _messageColor = Color.Success;
+            _alertMessage = "_addNextCloudAccount";
+            NextCloudAuthentication.Url = string.Empty;
+            NextCloudAuthentication.Password = string.Empty;
+            NextCloudAuthentication.UserName = string.Empty;
+            return;
+        }
+        else
+        {
+            _messageColor = Color.Error;
+            _alertMessage = "_incorrectCredentials";
+            NextCloudAuthentication.Url = string.Empty;
+            NextCloudAuthentication.Password = string.Empty;
+            NextCloudAuthentication.UserName = string.Empty;
+            return;
+        }
+    }
+    public async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+    void ButtonTestclick()
+    {
+        @if (_isShow)
+        {
+            _isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            _isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private void GoBack()
+    {
+        _navigationManager.NavigateTo("/res/cloud/add");
+    }
+}

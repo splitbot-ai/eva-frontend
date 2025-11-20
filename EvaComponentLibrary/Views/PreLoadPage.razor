@@ -1,0 +1,137 @@
+﻿@using Microsoft.JSInterop;
+@inject Services.SaveStringServices _saveManager;
+@inject NavigationManager NavigationManager;
+@inject EvaComponentLibrary.ViewModels.LoginViewModel _lm;
+@inject EvaComponentLibrary.ViewModels.PreloadViewModel _pre;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+
+
+@inject IJSRuntime _jsRuntime;
+
+
+<main class="main">
+	<div class="head @_blink">
+		<img src="_content/EvaComponentLibrary/img/brand/brand-icon.svg" alt="Alternate Text" />
+	</div>
+	<div class="name @_expand">
+		<img src="_content/EvaComponentLibrary/img/brand/brand-name.svg" alt="Alternate Text" />
+	</div>
+</main>
+
+@code {
+
+
+	private string _theme = string.Empty;
+	private string _expand = string.Empty;
+	private string _blink = "pulse";
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		base.OnInitialized();
+		try
+		{
+			_theme = await _saveManager.GetStringByKeyAsync("colorMode");
+		} catch (Exception e)
+		{
+			//(e.Message);
+		}
+
+
+
+		try
+		{
+			_jsRuntime?.InvokeVoidAsync("changeTheme", _theme);
+			_vm.ChangeThemeOfSafeArea(_theme);
+			_vm.themeMode = _theme;
+
+			StateHasChanged();
+
+		}
+		catch (Exception e)
+		{
+			//(e.Message);
+		}
+
+
+
+		string token = string.Empty;
+		_pre.Init();
+
+		try
+		{
+			token = await _saveManager.GetStringByKeyAsync("user");
+		}
+		catch (Exception e)
+		{
+			token = string.Empty;
+			//(e.Message);
+		}
+		if (!string.IsNullOrEmpty(token))
+		{
+
+			var refValid = await _lm.RefreshTokenAsync(token);
+	
+			if(refValid)
+			{
+
+				if (!string.IsNullOrEmpty(_vm.URLChatroomID))
+				{
+					NavigationManager.NavigateTo($"/chat/{_vm.URLChatroomID}");
+				}
+				else
+				{
+					NavigationManager.NavigateTo("/chat");
+				}
+
+				return;
+			}
+		}
+
+		await Task.Delay(2500);
+
+		_blink = string.Empty;
+		_expand = "expand";
+
+		StateHasChanged();
+
+		await Task.Delay(1000);
+
+
+		NavigationManager.NavigateTo("/login");
+		if (!string.IsNullOrEmpty(token))
+		{
+			var refValid = await _lm.RefreshTokenAsync(token);
+			if (refValid)
+			{
+				if (!string.IsNullOrEmpty(_vm.URLChatroomID))
+				{
+					NavigationManager.NavigateTo($"/chat/{_vm.URLChatroomID}");
+				}
+				else
+				{
+					NavigationManager.NavigateTo("/chat");
+				}
+			}
+			else
+			{
+				NavigationManager.NavigateTo("/login");
+			}
+		}
+		else
+		{
+			NavigationManager.NavigateTo("/login");
+		}
+		
+
+	}
+
+
+	private async Task SetNewServer()
+	{
+		string authServer = await _saveManager.GetStringByKeyAsync("authServer");
+		string realm = await _saveManager.GetStringByKeyAsync("realm");
+		string host = await _saveManager.GetStringByKeyAsync("host");
+		_lm.SetNetwork(authServer, realm, host);
+	}
+}

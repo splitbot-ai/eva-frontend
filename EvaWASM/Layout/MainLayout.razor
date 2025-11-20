@@ -1,0 +1,16 @@
+﻿@using EvaComponentLibrary.Views.Layout;
+@inject Services.PlatformDistinguisher _pd;
+@inherits LayoutComponentBase;
+<MudThemeProvider />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+	<MudMainContent>
+		<LibMainLayout Platform="@_pd.OSplatform">
+			@Body
+		</LibMainLayout>
+	</MudMainContent>
+</MudLayout>
+

@@ -1,0 +1,14 @@
+﻿@page "/res"
+@page "/res/{tab}/{subtab}/{child?}"
+
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources;
+
+<CascadingValue Name="ChildRoute" Value="Child">
+	<ExternalResources Tab="@Tab" SubTab="@Subtab"></ExternalResources>
+</CascadingValue>
+
+@code {
+	[Parameter] public string? Tab { get; set; }
+	[Parameter] public string? Subtab { get; set; }
+	[Parameter] public string? Child { get; set; }
+}

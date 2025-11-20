@@ -1,0 +1,313 @@
+﻿@using Microsoft.Extensions.Localization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Options;
+
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject ISnackbar Snackbar;
+@inject Logistic _lg;
+<div @onclick="ToggleOpen" class="backdrop-container @(Open? "open" : string.Empty  )">
+</div>
+
+
+<div class="main pullable-container @(Open? string.Empty :"close" ) ">
+	<div class="header">
+		<MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty :  "hide-the-info-buttons" )" />
+	</div>
+	<div class="body">
+		<MudTextField Class="searchbar"
+		@bind-Value="_search"
+		Label="@_locals["_search"]"
+		Immediate="true"
+		Variant="Variant.Outlined"
+		Adornment="Adornment.End"
+		AdornmentIcon="@Icons.Material.Filled.Search"
+		AdornmentColor="Color.Secondary" />
+
+		<MudTabs Class="@_slide" Elevation="0" Rounded="false" ApplyEffectsToContainer="true" PanelClass="pa-6">
+			@if (_lg.SourcePullableIsLoading && !_vm.Sources.Any())
+			{
+				<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+			}
+			<MudTabPanel Text="@_locals["_files"]" OnClick="@(_ => SlideElem("modal-tabs"))">
+				<div class="list-container">
+					<div class="list @(!_uc.FilesContainer.Any() ? "list-empty" : string.Empty)">
+
+						@if (!_uc.FilesContainer.Any())
+						{
+							<div class="empty">
+								<img src="_content/EvaComponentLibrary/img/box.png" />
+								<p>@_locals["_empty"]</p>
+							</div>
+						}
+
+						@foreach (var Source in _vm.Sources)
+						{
+							if ((Source.Name.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search)) && (Source.Category.Contains("file")))
+							{
+								<div class="item">
+									<label class="checkbox-container">
+										<p class="@(Source.Name.Replace(" ", "").Count() > 34 ? "long" : "short")">
+											@Source.Name.Replace(" ", "")
+										</p>
+										@if (Source.FileType == FileTypes.NEXTCLOUD)
+										{
+											<img style="height: 80%;" src="_content/EvaComponentLibrary/img/nextcloud.svg" />
+										}
+										else if (Source.FileType == FileTypes.ONEDRIVE)
+										{
+											<img style="height: 80%;" src="_content/EvaComponentLibrary/img/onedrive.svg" />
+											
+										}
+										<input type="checkbox" @bind="Source.IsChecked" name="name" value="" />
+										<span class="checkmark"></span>
+										@if (Source.FileType is FileTypes.UPLOAD || Source.FileType is FileTypes.NONE)
+										{
+											<MudFab OnClick="_ => Delete(Source)" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Delete" />
+										}
+									</label>
+								</div>
+							}
+						}
+					</div>
+				</div>
+			</MudTabPanel>
+			<MudTabPanel Text="@_locals["_website"]" OnClick="@(_ => SlideElem("modal-tabs slide"))">
+				<div class="list-container">
+					<div class="list  @(!_vm.SitesSaved.Any() ? "list-empty" : string.Empty)">
+
+						@if (!_vm.SitesSaved.Any())
+						{
+							<div class="empty">
+								<img src="_content/EvaComponentLibrary/img/box.png" />
+								<p>@_locals["_empty"]</p>
+							</div>
+						}
+
+						@foreach (var Source in _vm.Sources)
+						{
+							if ((Source.Name.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search)) && (Source.Category.Contains("website")))
+							{
+								<div class="item">
+									<label class="checkbox-container">
+										<p class="@(Source.Name.Replace(" ", "").Count() > 34 ? "long" : "short")">
+											@Source.Name.Replace(" ", "")
+										</p>
+										<input type="checkbox" @bind="Source.IsChecked" name="name" value="" />
+										<span class="checkmark"></span>
+										<MudFab OnClick="_ => Delete(Source)" Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Delete" />
+									</label>
+								</div>
+							}
+						}
+					</div>
+				</div>
+			</MudTabPanel>
+		</MudTabs>
+	</div>
+	<div class="footer">
+		<MudButton OnClick="CancelTheSelection" Variant="Variant.Filled">@_locals["_cancel"]</MudButton>
+		<MudButton OnClick="SaveReference" Variant="Variant.Filled" Color="Color.Primary">Auswählen</MudButton>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public bool Open { get; set; }
+
+	// [Parameter]
+	// public bool IsLoading { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+
+	private string _slide = "modal-tabs";
+
+	private string _search = string.Empty;
+	private bool _isLoading;
+	private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+	private string _dragClass = DefaultDragClass;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_vm.IsSourcesSelected += SourcesAlert;
+		_vm.UpdateInterface += CountSelectedSources;
+		_lg.UpdateSourcePullable += Update;
+
+	}
+
+	[Inject]
+	private IOptions<HostSettings> _hostSettings { get; set; }
+	private void InfoUploadDialog()
+	{
+		_lg.InfoMessage_1 = string.Format(_locals["_sourceSelection"], _hostSettings.Value.Brandname);
+		_lg.OnInfoModalToggle = true;
+		_lg.UpdateInfoModal?.Invoke();
+
+	}
+
+	private void ToggleOpen()
+	{
+		Open = !Open;
+		OnClose.InvokeAsync(Open);
+	}
+
+	private void SaveReference()
+	{
+		_vm.AddTheChosenSources();
+		CountSelectedSources();
+
+	}
+
+
+	private void CountSelectedSources()
+	{
+		_lg.NumberOfSelectedSources = _vm.Sources.Count(x => x.IsChecked);
+		_lg.update?.Invoke();
+	}
+
+	private void CancelTheSelection()
+	{
+		ToggleOpen();
+		if (_vm.ChosenSources.Any())
+		{
+			foreach(var source in _vm.Sources)
+			{
+				if (_vm.ChosenSources.Any(x => x == source.Id))
+				{
+					source.IsChecked = true;
+				}
+				else
+				{
+					source.IsChecked = false;
+				}
+			}
+		}
+		else
+		{
+			foreach(var source in _vm.Sources)
+			{
+				source.IsChecked = false;
+			}
+		}
+	}
+	private async Task SlideElem(string cls)
+	{
+		_slide = cls;
+		if (cls.Equals("modal-tabs slide"))
+		{
+			_isLoading = true;
+			await Task.Delay(2000);
+			await _uc.InitFiles();
+			_isLoading = false;
+		}
+	}
+
+
+	public void SourcesAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+
+			string message = "Die Quellen wurden übernommen.";
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Success, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+
+			ToggleOpen();
+		}
+		else if (isSucc == false)
+		{
+			string message = "Beim Übernehmen der Quellen ist ein Fehler aufgetreten.";
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+
+
+	public async Task Delete(Source Source)
+	{
+		if (Source.Category.Contains("website"))
+		{
+			string result = await _vm.DeleteWebsiteAsync(Source.Id);
+			if (!string.IsNullOrEmpty(result))
+			{
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(string.Format(_locals["_deletedSucc"], result), Severity.Success, config =>
+				{
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+			else
+			{
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+				{
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+		}
+		else
+		{
+			var result = await _uc.DeleteFileAsync(Source.Id);
+			if (result)
+			{
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(string.Format(_locals["_deletedSucc"], Source.Name), Severity.Success, config =>
+				{
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+			else
+			{
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+				{
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+
+		}
+	}
+
+	private async void  Update(){
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+	private void ClearDragClass()
+		=> _dragClass = string.Empty;
+	
+
+}

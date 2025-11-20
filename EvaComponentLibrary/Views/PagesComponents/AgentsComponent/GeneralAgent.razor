@@ -1,0 +1,291 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.Extensions.Options;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.ScheduledTaskViewModel _stvm;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject IOptions<HostSettings> _hostSettings;
+
+
+<div class="main tk-container">
+	<div class="title">
+		<svg @onclick="GoToAgentDashboard" class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>DoubleArrow</title><!--!--><g><rect fill="none" height="24" width="24"></rect><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20.08,11.42l-4.04-5.65C15.7,5.29,15.15,5,14.56,5h0c-1.49,0-2.35,1.68-1.49,2.89L16,12l-2.93,4.11 c-0.87,1.21,0,2.89,1.49,2.89h0c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C20.33,12.23,20.33,11.77,20.08,11.42z"></path><path d="M13.08,11.42L9.05,5.77C8.7,5.29,8.15,5,7.56,5h0C6.07,5,5.2,6.68,6.07,7.89L9,12l-2.93,4.11C5.2,17.32,6.07,19,7.56,19h0 c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C13.33,12.23,13.33,11.77,13.08,11.42z"></path></g></g></svg>
+		<h4>@_locals["_task"]</h4>
+		<MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty : "hide-the-info-buttons")" />
+	</div>
+	<MudTextField Disabled="TitleDisable" Placeholder="@_locals["_title"]" Class="searchbar"
+				  @bind-Value="_title"
+				  Immediate="true"
+				  Variant="Variant.Outlined"
+				  Adornment="Adornment.End" />
+
+	<MudTextField Placeholder="@string.Format(@_locals["_desTask"], _hostSettings.Value.Brandname)" Class="description" T="string" Immediate="true" @bind-Value="_describtion" Underline="false" Variant="Variant.Filled" Lines="10" />
+	<div class="websearch">
+		<MudSwitch @bind-Value="@_doWebseach" Color="Color.Primary">
+			<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>Language</title><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"></path></svg>
+			<p>@_locals["_webSearchbtn"]</p>
+		</MudSwitch>
+		<MudSwitch @bind-Value="@_triggerEvent" Color="Color.Primary">
+			<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>OfflineBolt</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 2.02c-5.51 0-9.98 4.47-9.98 9.98s4.47 9.98 9.98 9.98 9.98-4.47 9.98-9.98S17.51 2.02 12 2.02zm0 17.96c-4.4 0-7.98-3.58-7.98-7.98S7.6 4.02 12 4.02 19.98 7.6 19.98 12 16.4 19.98 12 19.98zM12.75 5l-4.5 8.5h3.14V19l4.36-8.5h-3z"></path></svg>
+			<p>@_locals["_eventTirgger"]</p>
+		</MudSwitch>
+	</div>
+
+	
+	
+	<div class="interval-container">
+		<div class="select-container">
+			<label for="interval">@_locals["_howOft"]</label>
+			<select name="interval" @bind="_interval" class="select-box" disabled="@(_triggerEvent ? true : false)">
+				<option value="" selected disabled>@_locals["_select"]</option>
+				<option value="@_values[0]">@_locals["_hourly"]</option>
+				<option value="@_values[1]"> @_locals["_daily"]</option>
+				<option value="@_values[2]">@_locals["_weekly"]</option>
+				<option value="@_values[3]">@_locals["_monthly"]</option>
+				<option value="@_values[4]">@_locals["_yearly"]</option>
+			</select>
+			<div class="icon-container">
+				<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 35 35"><path fill="currentColor" fill-rule="evenodd" d="M17 15a1 1 0 0 0 .707-1.707l-5-5a1 1 0 0 0-1.414 0l-5 5A1 1 0 0 0 7 15z" clip-rule="evenodd" stroke-width="0.5" stroke="currentColor" /></svg>
+			</div>
+		</div>
+		<div class="select-container  @(_interval.Equals("weekly") ? string.Empty : "hide")">
+			<label for="day">@_locals["_weekDay"]</label>
+			<select name="day" class="select-box" @bind="_preferDayOfWeek" disabled="@(_triggerEvent ? true : false)">
+				<option value="@_weekDay[0]">@_locals["_sun"]</option>
+				<option value="@_weekDay[1]"> @_locals["_mon"]</option>
+				<option value="@_weekDay[2]">@_locals["_tue"]</option>
+				<option value="@_weekDay[3]">@_locals["_wed"]</option>
+				<option value="@_weekDay[4]">@_locals["_thu"]</option>
+				<option value="@_weekDay[5]">@_locals["_fri"]</option>
+				<option value="@_weekDay[6]">@_locals["_sat"]</option>
+			</select>
+			<div class="icon-container">
+				<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 35 35"><path fill="currentColor" fill-rule="evenodd" d="M17 15a1 1 0 0 0 .707-1.707l-5-5a1 1 0 0 0-1.414 0l-5 5A1 1 0 0 0 7 15z" clip-rule="evenodd" stroke-width="0.5" stroke="currentColor" /></svg>
+			</div>
+		</div>
+		<div class="select-container @(_interval.Equals("yearly") ? string.Empty : "hide")">
+			<label for="month">@_locals["_month"]</label>
+			<select name="month" class="select-box" @bind="_preferMonth" disabled="@(_triggerEvent ? true : false)">
+				<option value="@_month[0]"> @_locals["_jan"]</option>
+				<option value="@_month[1]">@_locals["_feb"]</option>
+				<option value="@_month[2]">@_locals["_mar"]</option>
+				<option value="@_month[3]">@_locals["_apr"]</option>
+				<option value="@_month[4]">@_locals["_may"]</option>
+				<option value="@_month[5]">@_locals["_jun"]</option>
+				<option value="@_month[6]">@_locals["_jul"]</option>
+				<option value="@_month[7]">@_locals["_aug"]</option>
+				<option value="@_month[8]">@_locals["_sep"]</option>
+				<option value="@_month[9]">@_locals["_oct"]</option>
+				<option value="@_month[10]">@_locals["_nov"]</option>
+				<option value="@_month[11]">@_locals["_dec"]</option>
+			</select>
+			<div class="icon-container">
+				<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 35 35"><path fill="currentColor" fill-rule="evenodd" d="M17 15a1 1 0 0 0 .707-1.707l-5-5a1 1 0 0 0-1.414 0l-5 5A1 1 0 0 0 7 15z" clip-rule="evenodd" stroke-width="0.5" stroke="currentColor" /></svg>
+			</div>
+		</div>
+	</div>
+	<div class="title">
+		<h4>@_locals["_when"]</h4>
+	</div>
+	<div class="time-picker @(_interval.Equals("hourly") || _triggerEvent ? "blocked" : string.Empty)">
+		<MudTimePicker PickerVariant="PickerVariant.Dialog" Disabled="@(_interval.Equals("hourly") || _triggerEvent)" @bind-Time="_time" />
+	</div>
+	<div class="btn">
+		<MudButton Disabled="@(string.IsNullOrEmpty(_title) || string.IsNullOrEmpty(_describtion) || (!_triggerEvent && string.IsNullOrEmpty(_interval)))" OnClick="@(string.IsNullOrEmpty(Sub) || EditableTask ? AddTask : EditTask)" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@(string.IsNullOrEmpty(Sub) ? _locals["_createTask"] : _locals["_editTask"])</MudButton>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string? Sub { get; set; }
+	[Parameter]
+	public bool TitleDisable { get; set; }
+	[Parameter]
+	public bool EditableTask { get; set; }
+	private string _title = string.Empty;
+	private int _timeH;
+	private int _timeM;
+	private TimeSpan? _time { get; set; }
+	private string _describtion = string.Empty;
+	private ScheduledTask _newTask;
+	private bool _doWebseach { get; set; } = false;
+	private string _interval { get; set; } = string.Empty;
+	private string[] _values = ["hourly", "daily", "weekly", "monthly", "yearly"];
+	private int[] _weekDay = [0, 1, 2, 3, 4, 5, 6];
+	private int[] _month = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+	private int _preferDayOfWeek = -1;
+	private int _preferMonth = -1;
+	private bool _triggerEvent;
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		GetCurrentTime();
+		_lg.SetValueForEdit += SetValue;
+		if (!string.IsNullOrEmpty(Sub) || EditableTask)
+		{
+			_title = _lg.EditTask.Title;
+			_describtion = _lg.EditTask.Prompt;
+			_interval = _stvm.Interval;
+			_triggerEvent = _lg.EditTask?.Trigger?.Any() ?? false;
+			_preferDayOfWeek = _stvm.PreferDayOfWeek;
+			_preferMonth = _stvm.PreferMonth;
+			if (_lg.EditTask.Websearch.Equals("allow"))
+			{
+				_doWebseach = true;
+			}
+			else
+			{
+				_doWebseach = false;
+			}
+			_time = new TimeSpan(_stvm.LocalDate.Hour, _stvm.LocalDate.Minute, 0);
+		}
+		;
+	}
+	private void GetCurrentTime()
+	{
+		_timeH = DateTime.Now.Hour;
+		_timeM = DateTime.Now.Minute;
+		_time = new TimeSpan(_timeH, _timeM, 0);
+		_preferDayOfWeek = (int)DateTime.Now.DayOfWeek;
+		//(_preferDayOfWeek);
+		_preferMonth = DateTime.Now.Month;
+	}
+	private void SetValue()
+	{
+		_title = _lg.EditTask.Title;
+		_describtion = _lg.EditTask.Prompt;
+		_interval = _stvm.Interval;
+		_time = new TimeSpan(_stvm.LocalDate.Hour, _stvm.LocalDate.Minute, 0);
+		update();
+	}
+	private async void update()
+	{
+
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private void InfoUploadDialog()
+	{
+		_lg.InfoMessage_1 = _locals["_scheduledTaskInfo"];
+		_lg.OnInfoModalToggle = true;
+		_lg.UpdateInfoModal?.Invoke();
+	}
+	private void GoToAgentDashboard()
+	{
+
+		_lg.EditTask = null;
+		_vm.MessageItems.Clear();
+		foreach (var snack in _snacks)
+		{
+			Snackbar.Remove(snack);
+		}
+
+		NavigationManager.NavigateTo("/agent");
+	}
+
+	private async void AddTask()
+	{
+		var cron = _stvm.GenerateCronExpression(_interval, _time, _preferDayOfWeek, _preferMonth);
+		_newTask = new ScheduledTask
+		{
+			UserID = _ws.UserID,
+			Title = _title,
+			Prompt = _describtion,
+			Websearch = _doWebseach ? "allow" : "off",
+			Trigger = _triggerEvent ?
+			new List<string> { "new_mail_received_trigger" } :
+			new List<string>(),
+			Cron = cron
+		};
+		var result = await _stvm.AddScheduledTaskAsync(_newTask);
+		if (result)
+		{
+			_title = string.Empty;
+			_describtion = string.Empty;
+			_interval = string.Empty;
+			_triggerEvent = false;
+			_time = new TimeSpan(_timeH, _timeM, 0);
+			update();
+		}
+		Alert(result, "_taskSucc");
+	}
+	private async void EditTask()
+	{
+		var RoomExist = _vm.ScheduledMenuItems.Any(x => x.RoomId.Equals(_lg.EditTask.RoomId));
+		if (RoomExist)
+		{
+			var cron = _stvm.GenerateCronExpression(_interval, _time, _preferDayOfWeek, _preferMonth);
+			_newTask = new ScheduledTask
+			{
+				JobId = _lg.EditTask.JobId,
+				UserID = _ws.UserID,
+				Title = _title,
+				Prompt = _describtion,
+				Websearch = _doWebseach ? "allow" : "off",
+				Cron = cron
+			};
+			var result = await _stvm.EditScheduledTaskAsync(_newTask);
+			Alert(result, "_taskEdit");
+			return;
+		}
+		Alert(RoomExist, "_missTask");
+		_title = string.Empty;
+		_describtion = string.Empty;
+		_interval = string.Empty;
+		_triggerEvent = false;
+		_time = new TimeSpan(_timeH, _timeM, 0);
+		update();
+	}
+
+	private List<Snackbar> _snacks = new();
+
+	private void Alert(bool result, string message)
+	{
+		if (result)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			_snacks.Add(Snackbar.Add(_locals[message], Severity.Success, config =>
+			{
+				config.VisibleStateDuration = 1500;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			}));
+			// update();
+		}
+		else if (!result && !string.IsNullOrEmpty(message))
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			_snacks.Add(Snackbar.Add(_locals[message], Severity.Warning, config =>
+			{
+				config.VisibleStateDuration = 1500;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			}));
+		}
+		else if (!result && string.IsNullOrEmpty(message))
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			_snacks.Add(Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+			{
+				config.VisibleStateDuration = 1500;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			}));
+		}
+	}
+}

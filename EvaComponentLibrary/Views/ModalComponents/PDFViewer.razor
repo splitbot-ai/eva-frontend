@@ -1,0 +1,49 @@
+﻿@using Microsoft.Extensions.Localization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using System.Globalization;
+@using Microsoft.JSInterop;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject ISnackbar Snackbar;
+@inject IJSRuntime _jsRuntime;
+
+<div @onclick="ToggleOpen" class="backdrop-container @(Open? "open" : string.Empty  )">
+</div>
+<div class="main pullable-container @(Open? string.Empty :"close" ) " >
+	<div class="header">
+		<div class="container">
+			<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>FilePdf</title><!--!--><path d="M12.96 9.12h5.28l-5.28-5.28v5.28zM6.24 2.4h7.68l5.76 5.76v11.52c0 1.060-0.86 1.92-1.92 1.92v0h-11.52c-1.060 0-1.92-0.86-1.92-1.92v0-15.36c0-1.060 0.86-1.92 1.92-1.92v0zM10.176 11.424c-0.019 0.038-0.278 1.69-2.016 4.502 0 0-3.36 1.747-2.563 3.053 0.643 1.037 2.227-0.038 3.59-2.573 0 0 1.747-0.614 4.070-0.787 0 0 3.706 1.661 4.214-0.106 0.499-1.786-2.938-1.382-3.552-1.2 0 0-1.92-1.296-2.4-3.082 0 0 1.094-3.792-0.586-3.744s-1.046 3.005-0.758 3.936zM10.954 12.423c0.029 0.010 0.451 1.162 1.814 2.362 0 0-2.237 0.442-3.254 0.864 0 0 0.96-1.661 1.44-3.226zM14.726 15.034c0.557-0.154 2.237 0.144 2.17 0.461-0.058 0.317-2.17-0.461-2.17-0.461zM7.939 16.8c-0.509 1.19-1.382 1.92-1.603 1.92s0.672-1.536 1.603-1.92zM10.954 10.147c0-0.067-0.346-2.112 0-2.064 0.518 0.077 0 1.997 0 2.064z"></path></svg>
+			<p class="pdf-name @(_uc.PDFName.Contains(" ")? "pdf-name-space" : "pdf-name-no-space")">@_uc.PDFName</p>
+		</div>
+		<div class="tools-container" id="zoomDropdown">
+			<MudFab Color="Color.Primary" Size="Size.Small" @onclick="Close" StartIcon="@Icons.Material.Filled.Close" />
+		</div>
+	</div>
+	<iframe id="pdfjsframe" src="_content/EvaComponentLibrary/pdf-viewer/web/viewer.html"></iframe>
+</div>
+
+
+
+@code {
+	[Parameter]
+	public bool Open { get; set; } = true;
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+	[Parameter]
+	public bool PDFLoading { get; set; }
+
+	private async void Close()
+	{
+		_ = OnClose.InvokeAsync(false);
+	}
+	private void ToggleOpen()
+	{
+		Open = !Open;
+		OnClose.InvokeAsync(Open);
+
+	}
+}
+
+

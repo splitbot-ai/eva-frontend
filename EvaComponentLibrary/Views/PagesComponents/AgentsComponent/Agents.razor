@@ -1,0 +1,43 @@
+﻿﻿@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.Views.Components;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject NavigationManager NavigationManager;
+@inject WebServices _ws;
+
+
+<PageWrapper>
+	@ActivePage
+</PageWrapper>
+
+@code {
+	private RenderFragment? ActivePage => (SubPages?.ToLowerInvariant()) switch
+	{
+		"custom-agent" => @<GeneralAgent/>,
+		"web-agent" => @<MonitorAgent/>,
+		_ => @<CategoryAgents />
+	};
+
+	[CascadingParameter(Name = "SubPages")] 
+	public string? SubPages { get; set; }
+
+	protected override void OnInitialized()
+	{
+		 base.OnInitialized();
+		_lg.UpdateLanguage += update;
+	
+	}
+
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+}

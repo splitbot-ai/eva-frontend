@@ -1,0 +1,26 @@
+﻿@page "/chat"
+@page "/chat/{id}"
+@using EvaComponentLibrary.Views.PagesComponents.ChatRoom;
+@using EvaComponentLibrary.ViewModels;
+@inject MainViewModel _vm;
+@inject NavigationManager Navigation;
+@* @inject Services.PlatformDistinguisher _pd; *@
+@* <EvaComponentLibrary.Views.Chat Platform="@_pd.OSplatform" RoomIdInURL="SetId" SelectedRoomId="@Id"></EvaComponentLibrary.Views.Chat> *@
+<ChatRoom RoomIdInURL="@Id"></ChatRoom>
+
+
+
+
+@code{
+	[Parameter]
+	public string Id { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(!string.IsNullOrEmpty(Id)){
+			_vm.URLChatroomID = Id;
+		}
+
+	}
+
+}

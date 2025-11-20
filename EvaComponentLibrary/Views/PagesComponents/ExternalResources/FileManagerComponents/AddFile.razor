@@ -1,0 +1,235 @@
+﻿@using System;
+@using System.Threading;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using System.Net.Http.Headers;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject MySnackBar _sn;
+
+
+<div class="headline">
+    <p>@(_userInfo != null ? Math.Round((_userInfo.UsedStorage / 1000000000.0), 2) : 100)GB/@(_userInfo != null ? Math.Round((_userInfo.MaxStorage / 1000000000.0), 2) : 100)GB</p>
+    <MudProgressLinear Color="Color.Success" Rounded="true" Buffer="true" Size="Size.Large"
+                       Value="@(_userInfo != null ? ((double)((double)_userInfo.UsedStorage / (double)_userInfo.MaxStorage) * 100) : 100)"
+                       BufferValue="@(_userInfo != null ? (((double)(((double)_userInfo.UsedStorage + (double)_totalUsed) / (double)_userInfo.MaxStorage)) * 100) : 100)" />
+</div>
+
+<div class=" main content">
+    <div class="upload-container">
+        <div class="upload-display-container @_dragClass">
+            <!-- <input type="file" multiple OnChange="OnInputFileChanged"/>-->
+            <InputFile @ondragenter="SetDragClass"
+                       @ondragleave="ClearDragClass"
+                       @ondragend="ClearDragClass"
+                       disabled="@(!_canUpload)"
+                       OnChange="OnInputFileChanged" multiple
+                       accept="application/msword,
+                application/vnd.ms-excel,
+                application/docx,.docx,
+                application/vnd.ms-powerpoint,
+                text/plain,
+                application/pdf" />
+
+            <div class="prompt" style="@(_uc.Files.Any() ? "display: none" : string.Empty)">
+                <MudIcon Class="upload-icon" Icon="@Icons.Material.Filled.UploadFile"></MudIcon>
+                <p>@_locals["_addDocs"]</p>
+            </div>
+
+            <div class="upload-list">
+                @foreach (var file in _uc.Files)
+                {
+                    <div class="file-element @(file.Value.IsSending == false && file.Value.Success == false ? "file-element-error" : string.Empty) @(file.Value.IsSending == false && file.Value.Success == true ? "file-element-success" : string.Empty)">
+                        <div class="progress-container">
+                            <MudProgressLinear Color="Color.Secondary" Rounded="true" Striped="true" Size="Size.Small" Value="@file.Value.UploadedPercentage" />
+                        </div>
+                        <svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>InsertDriveFile</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
+                        <p>@($"{file.Value.Name.Substring(0, 5)}....{file.Value.Name.Split(".")[1]}")</p>
+                        <MudIconButton Style="margin-left:auto" Class="@( (file.Value.Success == null || file.Value.Success == false) && file.Value.IsSending == false ? string.Empty : "hide")" OnClick="_ => DeleteSingle(file.Value)" Icon="@Icons.Material.Filled.Close"></MudIconButton>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+    <MudButton Disabled="@((_uc.Files.Count.Equals(0) && _canUpload) || !_canUpload)" Style="border-radius: 50px;margin-top: 10px;" OnClick="UploadMulti" Variant="Variant.Filled" Color="@Color.Primary">@_locals["_uploadFiles"]</MudButton>
+</div>
+
+
+@code {
+
+
+
+    public string? theme { get; set; }
+    private const string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full";
+    private long _totalUsed = 0;
+    private string _dragClass = DefaultDragClass;
+    private bool _canUpload = true;
+    private User _userInfo;
+    private float _usedStorage;
+    private const int MaxFiles = 10;
+    private const long MaxFileBytes = 150L * 1024 * 1024; // 150 MB
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (!_vm.HasSession())
+            return;
+
+        _userInfo = await _uc.GetUserInfoAsync();
+        StateHasChanged();
+        update();
+        await base.OnInitializedAsync();
+        _uc.MainViewModel = _vm;
+        _lg.UpdateLanguage += update;
+
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (!_vm.HasSession())
+            return;
+
+        theme = _vm.themeMode;
+        _uc.UpdateUi += UpdateAsync;
+        _uc.IsUploading += CanUpload;
+        _uc.FileUpload += FileUploadAlert;
+
+    }
+    private async void UploadMulti()
+    {
+        _canUpload = false;
+        try
+        {
+            if (((double)_userInfo.UsedStorage + (double)_totalUsed) > _userInfo.MaxStorage)
+            {
+                _sn.PoPSnackBar(_locals["_reachLimit"], Severity.Error);
+                return;
+            }
+            foreach (var fileInfo in _uc.Files.Values)
+            {
+                fileInfo.IsSending = true;
+            }
+            await _uc.Upload(_uc.Files);
+            _userInfo = await _uc.GetUserInfoAsync();
+            update();
+        }
+        catch (Exception ex)
+        {
+            //(ex);
+        }
+        finally
+        {
+            _canUpload = true;
+        }
+    }
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > MaxFiles)
+        {
+            _sn.PoPSnackBar(_locals["_tooManyFiles"], Severity.Error);
+            return;
+        }
+        ClearDragClass();
+        var files = e.GetMultipleFiles();
+        try
+        {
+            foreach (var file in files)
+            {
+                using var stream = file.OpenReadStream(MaxFileBytes);
+                using var ms = new MemoryStream();
+
+                await stream.CopyToAsync(ms);
+
+                _uc.Files.Add(
+                    file.Name,
+                    new FileUploadInfo
+                    {
+                        Data = ms.ToArray(),
+                        Name = file.Name,
+                        Size = file.Size,
+                        ContentType = file.ContentType
+                    });
+            }
+            _totalUsed = files.Sum(f => f.Size);
+            update();
+        }
+        catch (Exception ex)
+        {
+            //(ex);
+        }
+        if (_uc.Files.Count > MaxFiles)
+        {
+            _sn.PoPSnackBar(_locals["_maxFiles"], Severity.Error);
+
+            var lastKey = _uc.Files.Keys.Last();
+            _uc.Files.Remove(lastKey);
+
+        };
+        ;
+
+        update();
+    }
+
+    private void DeleteSingle(FileUploadInfo file)
+    {
+        _totalUsed -= (long)_uc.Files[file.Name].Size;
+        _uc.Files.Remove(file.Name);
+        _uc.FilesToUpload = _uc.Files.Count;
+        if (!_uc.Files.Any())
+        {
+            _canUpload = true;
+        }
+        StateHasChanged();
+    }
+    private void SetDragClass()
+       => _dragClass = $"ondrag";
+
+    private void ClearDragClass()
+        => _dragClass = string.Empty;
+
+    public async void UpdateAsync()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+    public void update()
+    {
+        StateHasChanged();
+    }
+    private void CanUpload(bool canUp)
+    {
+        _canUpload = canUp;
+        if (canUp)
+            _uc.GetAllUploadedFiles().ConfigureAwait(false);
+    }
+
+
+
+    void FileUploadAlert(string message)
+    {
+
+        var (text, color) = message switch
+
+        {
+
+            null or "" => (_locals["_genError"], Severity.Error),
+            _ => (string.Format(_locals["_succFileUpload"], message), Severity.Info)
+        };
+
+        _sn.PoPSnackBar(text, color);
+
+    }
+
+}
+
+

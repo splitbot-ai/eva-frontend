@@ -1,0 +1,210 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.CloudBase;
+@using EvaComponentLibrary.Models.CloudBase.NextCloud;
+@using EvaComponentLibrary.Models.CloudBase.Ondrive;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.ViewModels.Cloud;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.CloudComponents.NextCloudComponents;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject NextCloudViewModel _ncvm;
+@inject OneDriveViewModel _odvm;
+@inject CloudBaseViewModel _cbvm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject MySnackBar _sn;
+@inject NavigationManager Nav;
+@inject Services.SaveStringServices _saveManager;
+
+<div class="content" style="@(!_isBrowserView ? "max-width: 540px;":string.Empty)">
+	<div class="felx-container">
+		@if (!_isBrowserView)
+		{
+
+			<MudTextField Class="searchbar"
+						  @bind-Value="_search"
+						  Label="@_locals["_search"]"
+						  Immediate="true"
+						  Variant="Variant.Outlined"
+						  Adornment="Adornment.End"
+						  AdornmentIcon="@Icons.Material.Filled.Search"
+						  AdornmentColor="Color.Secondary"
+						  autocomplete="off" />
+			@if (IsLoading && !_cbvm.CloudAccounts.Any())
+			{
+				<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+			}
+			<div class="scroll-list">
+				@if (!_cbvm.CloudAccounts.Any())
+				{
+					<div class="empty">
+						<img src="_content/EvaComponentLibrary/img/box.png" />
+						<p>@_locals["_empty"]</p>
+					</div>
+				}
+				<div class="scroll-content">
+					<Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize Context="account" Items="GetFilteredAccount()">
+
+							@if (account is NextCloudAccountInfo nextCloudAccount)
+							{
+								<div class="account-container">
+									<div class="logo">
+										<img src="_content/EvaComponentLibrary/img/nextcloud.svg" alt="Alternate Text" />
+									</div>
+									<div class="account-info">
+										<div class="info">
+											<h3>@nextCloudAccount.Url</h3>
+											<h5>Host</h5>
+										</div>
+										<div class="info">
+											<h3>@account.UserName</h3>
+											<h5>Username</h5>
+										</div>
+										<MudButton OnClick="_ => GetNextcloudDirectoryAsync(nextCloudAccount)" ButtonType="ButtonType.Submit" Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary">@_locals["_manage"]</MudButton>
+										<MudButton OnClick="_ => StartSync(nextCloudAccount.AccountId)" ButtonType="ButtonType.Submit" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">@_locals["_sync"]</MudButton>
+									</div>
+									<div class="delete-btn">
+										<MudIconButton Class="del-btn"
+													   OnClick="_ => DeleteNextCloudAsync(nextCloudAccount)"
+													   Icon="@Icons.Material.Filled.Delete">
+										</MudIconButton>
+									</div>
+								</div>
+
+							}
+							else if (account is OneDriveAccountInfo onDriveAccount)
+							{
+								<div class="account-container">
+									<div class="logo">
+										<img src="_content/EvaComponentLibrary/img/onedrive.svg" alt="Alternate Text" />
+									</div>
+									<div class="account-info">
+										<div class="info">
+											<h3>@onDriveAccount.Name</h3>
+											<h5>Name</h5>
+										</div>
+										<div class="info">
+											<h3>@onDriveAccount.UserName</h3>
+											<h5>Username</h5>
+										</div>
+										<MudButton OnClick="GetOneDriveFolder" ButtonType="ButtonType.Submit" Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary">@_locals["_manage"]</MudButton>
+										<MudButton OnClick="_ => StartSync()" ButtonType="ButtonType.Submit" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">@_locals["_sync"]</MudButton>
+									</div>
+									<div class="delete-btn">
+										<MudIconButton Class="del-btn"
+												   OnClick="FireAndForgetDeleteSafe"
+													   Icon="@Icons.Material.Filled.Delete">
+										</MudIconButton>
+									</div>
+								</div>
+							}
+					</Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+				</div>
+			</div>
+		}
+		else
+		{
+			@* <CloudFileBrowser ListType="_listType"></CloudFileBrowser> *@
+		}
+	</div>
+</div>
+@code {
+
+
+
+	[CascadingParameter(Name = "LoadingAnimation")]
+	public bool IsLoading { get; set; }
+
+	[CascadingParameter(Name = "ChildRoute")]
+	public string? ChildRoute { get; set; }
+
+	private bool _isBrowserView =>
+	string.Equals(ChildRoute, "browser", StringComparison.OrdinalIgnoreCase);
+	private string _search = string.Empty;
+	public bool ReadOnly;
+	private IEnumerable<CloudFileBase> _directoriesToShow {get; set; }
+	private EnteryType _listType { get; set; }
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+	}
+	private async void DeleteNextCloudAsync(NextCloudAccountInfo nc)
+	{
+		string result = await _ncvm.DeleteNextCloudAccountAsync(nc.AccountId);
+		update();
+		if (result.Equals("OK"))
+		{
+			_sn.PoPSnackBar(string.Format(_locals["_deletedSucc"], nc.Url), Severity.Success);
+		}
+		else
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+		}
+	}
+
+	private async Task GetNextcloudDirectoryAsync(NextCloudAccountInfo nc)
+	{
+		_ncvm.NextCloudAccountId = nc.AccountId;
+		_listType = EnteryType.NextCloud;
+		await _saveManager.SaveStringByKeyAsync("cloud", "nextcloud");
+		Nav.NavigateTo("/res/cloud/browser");
+	}
+	private async Task GetOneDriveFolder()
+	{
+		_listType = EnteryType.OneDrive;
+		await _saveManager.SaveStringByKeyAsync("cloud", "onedrive");
+		Nav.NavigateTo("/res/cloud/browser");
+	}
+	private async Task StartSync(string? nextcloudAccountID = null)
+	{
+		var result =  nextcloudAccountID switch
+		{
+			null or "" => await _odvm.StartOneDriveSync(),
+			_ =>await _ncvm.StartNextCloudSyncAsync(nextcloudAccountID)
+		};
+		if (result.Equals("Ok"))
+		{
+			_sn.PoPSnackBar(_locals["_fileSync"], Severity.Success);
+			return;
+		}
+
+		_sn.SnackBarManager(result);
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private List<CloudAccountInfo> GetFilteredAccount()
+	{
+		var q = _search?.Trim() ?? string.Empty;
+		return _cbvm.CloudAccounts.Where(a => a.SearchableText.IndexOf(_search) >= 0 || string.IsNullOrEmpty(_search)).ToList();
+	}
+
+	private Task FireAndForgetDeleteSafe(MouseEventArgs args)
+	{
+		_ = DeleteOneDriveAsync(); // fire and forget
+		return Task.CompletedTask;       // satisfy the delegate type
+	}
+
+	private async Task DeleteOneDriveAsync()
+	{
+		var result = await _odvm.DeleteOneDriveAccount();
+
+		if (string.IsNullOrEmpty(result))
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+			return;
+		}
+		_sn.PoPSnackBar(string.Format(_locals["_deletedSucc"], "OneDrive Account"), Severity.Info);
+	}
+}
+

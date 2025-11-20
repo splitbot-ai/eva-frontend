@@ -1,0 +1,50 @@
+﻿@import "styles/light-dark.scss";
+
+
+.main{
+    height:100dvh;
+    width:100dvw;
+    background-color:var(--background-color);
+}
+
+.content-container {
+    height: 100dvh;
+    width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+}
+
+.img-container{
+    width:min(70%,220px);
+    margin:20px 0;
+    img{
+        filter:var(--invert0-img);
+    }
+}
+
+
+.text-container{
+  
+    text-align:center;
+   p{
+       color:var(--text-color);
+       font-size:17px;
+       font-weight:600;
+       margin-bottom:10px;
+   }
+}
+::deep .mud-button-outlined{
+    color:var(--highlight-color);
+    border-color:var( --highlight-color);
+    border-radius:50px;
+
+}
+
+::deep .mud-button-outlined:hover{
+    border-color:var(--highlight-color);
+    color:white;
+    background-color:var(--highlight-color);
+} 

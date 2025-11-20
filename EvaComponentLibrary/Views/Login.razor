@@ -1,0 +1,410 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop;
+@using Microsoft.Extensions.Options;
+@using EvaComponentLibrary.Models;
+@* @inject EvaComponentLibrary.ViewModels.LoginViewModel _vm; *@
+@inject EvaComponentLibrary.ViewModels.LoginViewModel _lvm;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject IJSRuntime JS;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject IOptions<HostSettings> _hostSettings;
+
+
+<div class="main" style="@(_hostSettings.Value.isBeta ? "background-image: url('_content/EvaComponentLibrary/img/brand/isbeta.svg')" : string.Empty)">
+	<div class="top-menu">
+		<div class="custom-select">
+			<select class="form-control" @bind="Culture" style="width:100px; margin-left: 10px;">
+				@foreach (var cult in cultures)
+				{
+					<option value="@cult">@(cult.Name.StartsWith("de", StringComparison.OrdinalIgnoreCase) ? "Deutsch" : "English")</option>
+				}
+			</select>
+		</div>
+	</div>
+	<section>
+
+
+		<div class="logo white-logo">
+			<img src="_content/EvaComponentLibrary/img/brand/brand-logo.svg" />
+		</div>
+
+		<div class="tabs-container">
+			<input checked type="radio" name="name" value="" id="tab-1" @onclick="ToggleSwitch" />
+			<input type="radio" name="name" value="" id="tab-2" @onclick="ToggleSwitch" />
+			<div class="active @(_toReg? "actived" : string.Empty)"></div>
+			<label class="label-1 @(_toReg? string.Empty : "selected")" for="tab-1">@_locals["_login"]</label>
+			<label class="label-2 @(_toReg? "selected" : string.Empty)" for="tab-2">@_locals["_signup"]</label>
+		</div>
+
+		<div class="login-container" style="@(_toReg ? "display: none;" : "display: flex;")">
+			<div class="input-container">
+				<form class="login-form" @onsubmit="LoginUser">
+					<MudTextField Immediate="true" @bind-Value="_username" Label="@_locals["_username"]"
+					Required Variant="Variant.Outlined" InputType="@Text"></MudTextField>
+
+					<MudTextField Immediate="true" @bind-Value="_pass" Label="@_locals["_pass"]" Required Variant="Variant.Outlined"
+					InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+
+
+					<button class="submit-btn @(IsSubmitDisabled? "disabled" : string.Empty) " type="submit" disabled="@(IsSubmitDisabled)" value="Submit">@_locals["_login"]</button>
+				</form>
+			</div>
+			<div class="link-container">
+				<a href="@(_iss + "/login-actions/reset-credentials")" target="@(Platform.Equals("android") || Platform.Equals("Web") ? "_blank" : string.Empty)">@_locals["_forgotPass"]</a>
+ 				<a href="onpremise">@_locals["_on-Premise"]</a>
+				<a href="https://splitbot.de/datenschutzerklaerung/">@_locals["_privacy"]</a>
+			</div>
+		</div>
+
+
+		<div class="server-container" style="@(!_toReg ? "display: none;" : "display: flex;")">
+			<div class="input-container">
+				<form class="login-form" @onsubmit="PostNewUserAsync">
+					<MudTextField Immediate="true" @bind-Value="_name" Label="@_locals["_name"]" Required Variant="Variant.Outlined"></MudTextField>
+
+					<MudTextField Immediate="true" @bind-Value="_famname" Label="@_locals["_familyname"]" Required Variant="Variant.Outlined"></MudTextField>
+
+
+					<MudTextField Immediate="true" @bind-Value="_mail" Label="@_locals["_email"]" Required Variant="Variant.Outlined"></MudTextField>
+
+					<MudTextField Immediate="true" @bind-Value="_newpass" Label="@_locals["_pass"]" Required Variant="Variant.Outlined"
+					InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+
+					<MudTextField Immediate="true" @bind-Value="_newpassrepeat" Label="@_locals["_newPass"]" Required Variant="Variant.Outlined"
+					InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+					<button class="submit-btn @(IsRegisterDisabled? "disabled" : string.Empty) " type="submit" disabled="@(IsRegisterDisabled)" value="Submit">@_locals["_login"]</button>
+				</form>
+			</div>
+
+		</div>
+	</section>
+
+</div>
+
+
+
+
+@code {
+	[Parameter]
+	public string Platform { get; set; }
+	private string? _username = string.Empty;
+	private string? _pass = string.Empty;
+	private string? _lightDark;
+
+	private string? _name;
+	private string? _famname;
+	private string? _mail;
+	private string? _newpass;
+	private string? _newpassrepeat;
+
+	//var ass = Assembly.GetExecutingAssembly()
+	
+#if DEBUG
+	private string _iss => _hostSettings.Value.Dev.iss;
+#else
+	private string _iss => _hostSettings.Value.Prod.iss;
+#endif
+	
+	public string? theme { get; set; }
+
+	private bool _toReg = false;
+
+	private bool _isSending = false;
+
+	private bool _theModeIdentifier = false;
+	InputType PasswordInput = InputType.Password;
+	InputType Text = InputType.Text;
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+
+	private bool IsSubmitDisabled =>
+				string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_pass) || _isSending;
+
+	private bool IsRegisterDisabled =>
+				string.IsNullOrEmpty(_name) || string.IsNullOrEmpty(_famname) || string.IsNullOrEmpty(_mail) || string.IsNullOrEmpty(_newpass) || string.IsNullOrEmpty(_newpassrepeat) || _isSending;
+	bool isShow;
+	void ButtonTestclick()
+	{
+		@if (isShow)
+		{
+			isShow = false;
+			PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+			PasswordInput = InputType.Password;
+		}
+		else
+		{
+			isShow = true;
+			PasswordInputIcon = Icons.Material.Filled.Visibility;
+			PasswordInput = InputType.Text;
+		}
+	}
+
+	private void ToggleSwitch()
+	{
+		_toReg = !_toReg;
+	}
+
+	protected override async void OnInitialized()
+	{
+		await base.OnInitializedAsync();
+		var CurrentCulture = NormalizeCulture(CultureInfo.CurrentCulture.Name);
+		Culture = cultures.FirstOrDefault(c => c.Name == CurrentCulture) ?? cultures[0];
+
+		_lvm.Init();
+
+		theme = _vm.themeMode;
+		_lvm.Validation += ValidationEvent;
+		_lvm.Registration += RegistrationResult;
+		_ws.SafeToken += SafeTokenAsync;
+	}
+
+	private void ValidationEvent(bool result)
+	{
+		_ = ValidationResult(result);
+	}
+
+	private async Task ValidationResult(bool result)
+	{
+		if (!result)
+		{
+			_username = string.Empty;
+			_pass = string.Empty;
+			LoginAlert(result);
+			await InvokeAsync(() => StateHasChanged());
+			return;
+		}
+		await InvokeAsync(() => StateHasChanged());
+		LoginAlert(result);
+		await Task.Delay(1000);
+
+
+		if (!string.IsNullOrEmpty(_vm.URLChatroomID))
+		{
+			NavigationManager.NavigateTo($"/chat/{_vm.URLChatroomID}");
+		}
+		else
+		{
+			NavigationManager.NavigateTo("/chat");
+		}
+	}
+
+	public void SafeTokenAsync(string token) =>
+		_saveManager.SaveStringByKeyAsync("user", token);
+
+	private void changingTheMode()
+	{
+		_theModeIdentifier = !_theModeIdentifier;
+	}
+
+	private async Task LoginUser()
+	{
+		try
+		{
+			if (string.IsNullOrEmpty(_pass) || string.IsNullOrEmpty(_username))
+			{
+				bool? isSucc = null;
+				LoginAlert(isSucc);
+			}
+			else
+			{
+				_isSending = true;
+				await _lvm.LoginAsync(_username, _pass);
+				StateHasChanged();
+			}
+
+		}
+		catch (Exception ex)
+		{
+			//($"No Log {ex.Message}");
+		}
+	}
+
+
+	void LoginAlert(bool? isSucc)
+	{
+		_isSending = false;
+		StateHasChanged();
+
+		if (isSucc == true)
+		{
+			string message = "Login erfolgreich";
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Success, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else if (isSucc == false)
+		{
+
+			string message = "falsche Login Daten";
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+			return;
+		}
+		else
+		{
+			string message = "Bitte fülle alle Felder aus.";
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Warning, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+
+	void registrationAlert(string? isSucc)
+	{
+		_isSending = false;
+		if (isSucc.Equals("true"))
+		{
+			NavigationManager.NavigateTo("/message");
+		}
+		else if (isSucc.Equals("false"))
+		{
+
+			string message = _locals["_error"];
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else if (isSucc.Equals("exists"))
+		{
+			string message = _locals["_emailExists"];
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Warning, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else
+		{
+			string message = _locals["_fillAll"];
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Warning, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+	void passWordValidationIsFalse()
+	{
+
+
+		string message = "Die Passwörter stimmen nicht überein.";
+		Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+		Snackbar.Add(message, Severity.Error, config =>
+		{
+			config.SnackbarVariant = Variant.Filled;
+			config.CloseAfterNavigation = true;
+			config.ShowCloseIcon = false;
+
+		});
+
+	}
+
+
+	private void RegistrationResult(string isSucc)
+	{
+		registrationAlert(isSucc);
+	}
+	private async Task PostNewUserAsync()
+	{ 
+		if (string.IsNullOrEmpty(_name) || string.IsNullOrEmpty(_famname) || string.IsNullOrEmpty(_mail) || string.IsNullOrEmpty(_newpass) || string.IsNullOrEmpty(_newpassrepeat))
+		{
+			string? isSucc = null;
+			registrationAlert(isSucc);
+		}
+		else if (_newpass != _newpassrepeat)
+		{
+			passWordValidationIsFalse();
+
+			_newpassrepeat = string.Empty;
+			StateHasChanged();
+		}
+		else
+		{
+			var data = _lvm.registrationData;
+
+			data.GivenName = _name;
+			data.FamilyName = _famname;
+			data.Email = _mail;
+			data.Password = _newpass;
+			data.Iss = _iss;
+			_isSending = true;
+			await _lvm.PostNewUserAsync(data);
+			_newpassrepeat = string.Empty;
+
+		}
+	}
+
+	private string NormalizeCulture(string cultureName)
+	{
+		if (cultureName.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+			return "en-US";
+		if (cultureName.StartsWith("de", StringComparison.OrdinalIgnoreCase))
+			return "de-DE";
+
+		return cultureName;
+	}
+
+	private CultureInfo[] cultures = new[]
+	{
+		new CultureInfo("de-DE"),
+		new CultureInfo("en-US")
+	};
+
+
+
+	public CultureInfo Culture
+	{
+		get => CultureInfo.CurrentCulture;
+		set
+		{
+			if (CultureInfo.CurrentCulture != value)
+			{
+
+				Thread.CurrentThread.CurrentCulture = value;
+				Thread.CurrentThread.CurrentUICulture = value;
+				CultureInfo.DefaultThreadCurrentCulture = value;
+				CultureInfo.DefaultThreadCurrentUICulture = value;
+
+				StateHasChanged();
+			}
+		}
+	}
+	// from here
+
+
+
+
+}

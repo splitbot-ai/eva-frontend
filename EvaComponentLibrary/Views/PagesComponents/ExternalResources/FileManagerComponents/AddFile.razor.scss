@@ -1,0 +1,276 @@
+﻿@import"../../../styles/light-dark.scss";
+
+.main {
+}
+
+.headline {
+    position: relative;
+
+    ::deep .mud-progress-linear {
+        .mud-progress-linear-bar:first-child {
+            opacity: 0 !important;
+        }
+    }
+
+    p {
+        position: absolute;
+        transform: translateX(-50%);
+        left: 50%;
+        top: -3px;
+        font-family: "Kanit-Bold";
+        z-index: 2;
+    }
+
+    a {
+        color: var(--text-color);
+    }
+}
+
+.upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    ::deep button:disabled {
+        background-color: var(--highlight-color);
+        opacity: .5;
+    }
+
+    .upload-display-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        height: 250px;
+        background-color: var(--primary-color);
+        border: .5px solid var(--text-color) !important;
+        border-radius: 15px;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+
+
+
+        .prompt {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+
+            ::deep .upload-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                padding: 10px;
+                color: var(--secondary-color);
+                background-color: var(--text-color);
+            }
+
+            p {
+                font-size: 1rem;
+                text-transform: uppercase;
+                font-family: Kanit-Bold;
+            }
+        }
+
+        ::deep input,
+        input {
+            position: absolute !important;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            left: 0;
+            top: 0;
+            z-index: 1;
+        }
+
+
+
+        .upload-list {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            z-index: 0;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 9;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+
+            .file-element {
+                background-color: var(--sidebar-color);
+                width: 200px;
+                height: 60px;
+                display: flex;
+                flex-direction: row;
+                align-content: center;
+                align-items: center;
+                padding: 0px 15px;
+                border-radius: 30px;
+                position: relative;
+                overflow: hidden;
+                pointer-events: all;
+                justify-content: flex-start;
+                align-items: center;
+                transition: .33s;
+
+                p {
+                    color: var(--text-color);
+                    z-index: 2;
+                }
+
+                ::deep button {
+                    color: var(--text-color);
+                    pointer-events: all;
+                    z-index: 4;
+                }
+
+
+
+                ::deep.progress-container {
+                    width: 100px;
+                    position: absolute;
+                    bottom: 5px;
+                    left: 25%;
+
+                    .mud-progress-linear {
+
+                        .mud-progress-linear-bars {
+
+                            .mud-progress-linear-bar {
+                                background-color: var(--highlight-color)
+                            }
+                        }
+
+                        .mud-progress-linear-color-secondary:not(.mud-progress-linear-buffer)::before {
+                            background-color: var(--primary-color);
+                            opacity: 1;
+                        }
+                    }
+                }
+
+                .file-element-success {
+                    background-color: #6cd938;
+                }
+
+                .file-element-error {
+                    background-color: #d93b38;
+                }
+            }
+        }
+
+        .ondrag {
+            box-shadow: 0px 0px 5px 2px var(--text-color);
+        }
+    }
+
+    .content {
+        overflow: hidden;
+        height: 100%;
+
+        ::deep .mud-button-filled {
+            box-shadow: unset !important;
+        }
+
+        .felx-container {
+            overflow: hidden;
+            height: 100%;
+
+            .scroll-list {
+                overflow-y: auto;
+                scrollbar-gutter: stable;
+                height: 270px;
+
+                .empty {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+
+                    p {
+                        color: var(--text-color);
+                        font-family: 'Kanit-Bold';
+                        font-size: 1.17em;
+                    }
+
+                    img {
+                        width: 70px;
+                        opacity: 0.8;
+                        filter: var(--invert100-img);
+                    }
+                }
+
+                .scroll-content {
+                }
+            }
+
+            .list-empty {
+                height: 100%;
+            }
+        }
+
+        ::deep.mud-input-control {
+            .mud-input {
+                .mud-input-slot {
+                    color: var(--text-color);
+                    opacity: .8;
+                }
+            }
+
+            .mud-input-outlined-border {
+                border-radius: 50px !important;
+                border: 2px solid var(--highlight-color) !important;
+                margin-bottom: 5px !important;
+            }
+
+            .mud-input-adornment {
+                .mud-icon-root {
+                    fill: var(--highlight-color) !important;
+                }
+            }
+
+            .mud-input {
+                font-family: "Kanit-Bold";
+            }
+        }
+
+    .mud-
+    {
+        margin: 15px 0px;
+
+            .mud-switch-span .mud-switch-track {
+                background-color: var(--highlight-color);
+                box-shadow: unset;
+            }
+        }
+
+        ::deep.mud-button-filled.mud-button-filled-primary {
+            border-radius: 50px;
+            background-color: var(--highlight-color);
+            margin-top: 10px;
+            box-shadow: unset !important;
+        }
+
+        ::deep.mud-button-filled.mud-button-filled-primary:disabled {
+            border-radius: 50px;
+            background-color: var(--highlight-color) !important;
+            opacity: .7;
+            margin-top: 10px;
+            box-shadow: unset !important;
+        }
+    }
+
+    ::deep .mud-button-filled {
+        box-shadow: unset;
+    }
+
+    .margin-left {
+        margin-left: auto;
+    }
+}

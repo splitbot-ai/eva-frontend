@@ -1,0 +1,186 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.Extensions.Options;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.ScheduledTaskViewModel _stvm;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject NavigationManager NavigationManager;
+@inject MySnackBar _sn;
+@inject ISnackbar Snackbar;
+@inject IOptions<HostSettings> _hostSettings;
+@inject EvaComponentLibrary.ViewModels.MonitoringViewModel _monitorvm;
+
+<div class="main tk-container">
+	<div class="title">
+		<svg @onclick="GoToAgentDashboard" class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>DoubleArrow</title><!--!--><g><rect fill="none" height="24" width="24"></rect><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20.08,11.42l-4.04-5.65C15.7,5.29,15.15,5,14.56,5h0c-1.49,0-2.35,1.68-1.49,2.89L16,12l-2.93,4.11 c-0.87,1.21,0,2.89,1.49,2.89h0c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C20.33,12.23,20.33,11.77,20.08,11.42z"></path><path d="M13.08,11.42L9.05,5.77C8.7,5.29,8.15,5,7.56,5h0C6.07,5,5.2,6.68,6.07,7.89L9,12l-2.93,4.11C5.2,17.32,6.07,19,7.56,19h0 c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C13.33,12.23,13.33,11.77,13.08,11.42z"></path></g></g></svg>
+		<h4>@_locals["_addWebsite"]</h4>
+		<MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty : "hide-the-info-buttons")" />
+	</div>
+	<div class="search-container">
+		<input class="input-field"
+			   @bind="_title"
+			   @bind:event="oninput"
+			   @onkeydown="AddToUrlList"
+			   placeholder="@_locals["_title"]" />
+	</div>
+	<div class="search-container">
+		<input class="input-field"
+			   type="search"
+			   @bind="_url"
+			   @bind:event="oninput"
+			   @onkeydown="AddToUrlList"
+			   placeholder="@_locals["_addWebsite"]" />
+
+		@if (FilteredSites?.Any() == true)
+		{
+			<div class="autocomplete">
+				<ul class="suggestions">
+					@foreach (var site in FilteredSites)
+					{
+						<button tabindex="0" class="web-elem" @onclick="() => SelectSite(site.Url)">
+							@site.Url
+						</button>
+					}
+				</ul>
+			</div>
+		}
+		<MudButton Class="btn"
+				   OnClick="AddToList" ButtonType="ButtonType.Button" Variant="Variant.Filled"
+				   Color="Color.Primary">@_locals["_addUrl"]</MudButton>
+	</div>
+
+	<div class="website-container" style="flex: 1">
+		@if (_monitorvm.Websites?.Any() == true)
+		{
+			@foreach (var website in _monitorvm.Websites)
+			{
+				<p class="website">
+					@website <MudIcon Class="remove-icon"
+								   @onclick="_ => RemoveFromList(website)" Icon="@Icons.Material.Outlined.Clear"></MudIcon>
+				</p>
+			}
+		}
+	</div>
+	<MudButton Class="btn" Disabled="@(!_monitorvm.Websites.Any() || string.IsNullOrEmpty(_title) ? true: false)" OnClick="addAgent" ButtonType="ButtonType.Button" Variant="Variant.Filled"
+			   Color="Color.Primary">@_locals["_createMonitoring"]</MudButton>
+</div>
+
+@code {
+	[Parameter]
+	public string? Sub { get; set; }
+	private string _title = string.Empty;
+	private string? _url = string.Empty;
+	private List<Website> _safedWebsites = new();
+	private List<Website> FilteredSites = new();
+
+	private void SelectSite(string url)
+	{
+		_url = url;
+		FilteredSites.Clear();
+	}
+
+	private void AddToUrlList(KeyboardEventArgs args)
+	{
+		if (string.IsNullOrWhiteSpace(_url?.Trim()))
+		{
+			FilteredSites.Clear();
+			return;
+		}
+		try
+		{
+			FilteredSites = _safedWebsites
+					.Where(s => s.Url.Contains(_url, StringComparison.OrdinalIgnoreCase))
+					.ToList();
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
+
+		if (args.Key.Equals("Enter"))
+			AddToList();
+
+
+	}
+
+	private void RemoveFromList(string url)
+	{
+		_monitorvm.Websites.Remove(url);
+		_safedWebsites.Add(_vm.SitesSaved?.FirstOrDefault(w => w.Url.Equals(url)));
+	}
+
+	private void AddToList()
+	{
+		if (!string.IsNullOrWhiteSpace(_url))
+		{	
+			var normalizeUrl = _vm.NormalizeUrl(_url);
+			if (_monitorvm.TryAddLink(normalizeUrl))
+			{
+				_sn.PoPSnackBar("_existedLink", Severity.Warning);
+				return;
+			}
+			_monitorvm.Websites?.Add(normalizeUrl);
+			_url = string.Empty;
+			FilteredSites.Clear();
+		}
+	}
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		_lg.UpdateLanguage += update;
+
+	}
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await _vm.InitWebSave();
+		_safedWebsites = _vm.SitesSaved.ToList();
+		await base.OnInitializedAsync();
+	}
+
+
+	private async void update()
+	{
+
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private void InfoUploadDialog()
+	{
+		_lg.InfoMessage_1 = _locals["_scheduledTaskInfo"];
+		_lg.OnInfoModalToggle = true;
+		_lg.UpdateInfoModal?.Invoke();
+	}
+
+	private void GoToAgentDashboard()
+	{
+		foreach (var snack in _snacks)
+		{
+			Snackbar.Remove(snack);
+		}
+
+		NavigationManager.NavigateTo("/agent");
+	}
+	private List<Snackbar> _snacks = new();
+
+	private async Task addAgent()
+	{
+		var resutl = await _monitorvm.CreateNewMonitoringAgent(_title);
+		_sn.SnackBarManager(resutl);
+		if (resutl.Equals("OK"))
+		{
+			_title = string.Empty;
+			_monitorvm.Websites.Clear();
+		}
+	}
+}

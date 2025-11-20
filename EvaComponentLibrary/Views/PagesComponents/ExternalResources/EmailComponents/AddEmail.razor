@@ -1,0 +1,49 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.Services;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject EMailViewModel _evm;
+@inject WebServices _ws;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject IJSRuntime _js;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject NavigationManager NavigationManager;
+<div class=" main email-add-container">
+	<div @onclick="GoToIMAP" class="email-options">
+		<img class="email-icon" src="_content/EvaComponentLibrary/img/arroba.png" />
+		<h3>@_locals["_addEMail"]</h3>
+	</div>
+	<div @onclick="GoToGoogle" class="email-options @(SuperUser ? string.Empty : "disable")">
+		<img class="email-icon" src="_content/EvaComponentLibrary/img/google.png" />
+		<h3>@_locals["_addGmail"]</h3>
+		<div class="coming-soon @(SuperUser ? "hide" : string.Empty)">
+			<img class="email-icon" src="_content/EvaComponentLibrary/img/coming-soon.png" />
+		</div>
+	</div>
+</div>
+
+
+@code{
+	public bool SuperUser;
+	protected override async Task OnInitializedAsync()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		SuperUser = _ws.UserMail.Equals("testuser@splitbot.de");
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private void GoToIMAP(){
+		NavigationManager.NavigateTo("/res/imap/add");
+	}
+	private async Task GoToGoogle(){
+		await _ws.GoogleOauthAsync();
+		await _js.InvokeVoidAsync("openLinkInNewTab", _evm.GoogleOauth);
+	}
+}

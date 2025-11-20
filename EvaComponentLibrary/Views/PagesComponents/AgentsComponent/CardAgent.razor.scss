@@ -1,0 +1,57 @@
+﻿@import "../../styles/light-dark.scss";
+
+.card-wrapper {
+    height: min-content;
+    position: relative;
+    cursor: pointer;
+
+    .title {
+        position: relative;
+        top: 17px;
+        left: 0;
+        height: 17px;
+        width: 67px;
+        clip-path: inset(0.5px round 8px 0);
+        background: var(--highlight-color);
+        text-align: center;
+
+        svg {
+            color: #eee;
+        }
+    }
+
+    .card {
+        position: relative;
+        height: 130px;
+        width: 140px;
+        background-color: var(--primary-color);
+        clip-path: path("M 10,20 L 60,20 A 10,10 0,0,0 70,10 L 70,10 A 10,10 0,0,1 80,0 L 130,0 A 10,10 0,0,1 140,10 L 140,120 A 10,10 0,0,1 130,130 L 10,130 A 10,10 0,0,1 0,120 L 0,30 A 10,10 0,0,1 10,20 Z");
+
+        ::deep .expert-agent-icon {
+            height: 192px;
+            width: 100px;
+            top: 0;
+            left: -9px;
+            position: absolute;
+            color: var(--secondary-color);
+        }
+
+        .body {
+            color: var(--text-color);
+            position: absolute;
+            top: 20%;
+            left: 10px;
+            width: 100%;
+            font-size: .9em;
+            font-family: "roboto-medium";
+        }
+
+        .footer {
+            color: var(--highlight-color);
+            position: absolute;
+            top: 70%;
+            left: 70%;
+            width: 100%;
+        }
+    }
+}

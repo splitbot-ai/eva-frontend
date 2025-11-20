@@ -1,0 +1,470 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.CloudBase;
+@using EvaComponentLibrary.Models.CloudBase.Ondrive;
+@using EvaComponentLibrary.Models.CloudBase.NextCloud;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Views.AnimationComponents;
+@using Microsoft.AspNetCore.WebUtilities;
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Primitives;
+@using Microsoft.JSInterop;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.ViewModels.Cloud.NextCloudViewModel _ncvm;
+@inject EvaComponentLibrary.ViewModels.Cloud.CloudBaseViewModel _cbvm;
+@inject EvaComponentLibrary.ViewModels.Cloud.OneDriveViewModel _odvm;
+@inject NavigationManager NavigationManager;
+@inject MySnackBar _sn;
+@inject Services.SaveStringServices _saveManager;
+@inject IJSRuntime _jsRuntime;
+@implements IDisposable
+
+<div class="main file-browser">
+	<div class=" toolbar">
+		<div class="navbar">
+			<div class="back-forward-btn">
+				<MudIconButton Style="@(!_canUndo ? "fill-opacity: 0.4;" : string.Empty)" OnClick="Undo" Disabled="@(!_canUndo || IsLoading)" Icon="@Icons.Material.Outlined.ArrowCircleLeft" Color="Color.Primary" aria-label="github" />
+				<MudIconButton Style="@(!_canRedo ? "fill-opacity: 0.4;" : string.Empty)" OnClick="Redo" Disabled="@(!_canRedo || IsLoading)" Icon="@Icons.Material.Outlined.ArrowCircleRight" Color="Color.Primary" aria-label="github" />
+			</div>
+			<div class="utility">
+				<MudTextField Class="searchbar"
+							  @bind-Value="_search"
+							  Placeholder="@_locals["_search"]"
+							  Immediate="true"
+							  Variant="Variant.Outlined"
+							  Adornment="Adornment.Start"
+							  AdornmentIcon="@Icons.Material.Filled.Search"
+							  AdornmentColor="Color.Secondary"
+							  Margin="Margin.Dense"
+							  autocomplete="off" />
+			</div>
+			<MudIconButton Icon="@Icons.Material.Rounded.Clear" OnClick="GoBackToManage" Color="Color.Primary" aria-label="github" />
+		</div>
+		<div id="path">
+			<div id="crumbs">
+				<ul id="segment">
+					<li class="@(IsLoading ? "no-pointer" : string.Empty)" @onclick='_ => ChangeDirectory("/")'>
+						<span>
+							<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" viewBox="0 0 24 24" aria-hidden="true" role="img">
+								<title>Home</title>
+								<path d="M0 0h24v24H0V0z" fill="none"></path>
+								<path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z"></path>
+							</svg>
+						</span>
+					</li>
+					<li class="ellipsis" aria-hidden="true"><span class="no-pointer">…</span></li>
+					@{
+						var cleaned = CurrentPath.Trim('/');
+						if (!string.IsNullOrEmpty(cleaned))
+						{
+							var segments = cleaned.Split('/');
+							foreach (var segment in segments)
+							{
+								<li  class="@(IsLoading ? "no-pointer" : string.Empty)" @onclick="_ => ChangeDirectory(segment)"><span>@segment</span></li>
+							}
+						}
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="table-section">
+		<div class="loading-layer @(IsLoading ? "loading" : string.Empty)"></div>
+		<Squircle Class="@(IsLoading ? "loading" : string.Empty)"></Squircle>
+		<div class="table-container">
+			<table class="@(IsLoading ? "no-pointer" : string.Empty)">
+				<colgroup>
+					<col style="width: 10px;">
+					<col style="width: 113px;">
+					<col style="width: 17px;">
+					<col style="width: 12px;">
+					<col style="width: 10px;">
+					<col style="width: 0px;">
+				</colgroup>
+				<thead>
+					<tr class="select-all">
+						<th><MudCheckBox class="" value="SelectAll" ValueChanged="(bool? val) => ChangeAllItemState()" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox></th>
+						<th>@_locals["_file"]</th>
+						<th>@_locals["_lastSync"]</th>
+						<th>@_locals["_status"]</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Directories)
+					{
+						if (item is NextCloudFile nextCloud)
+						{
+							if (nextCloud.Name.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+							{
+								<tr>
+									@if (nextCloud.Type.Equals("dir"))
+									{
+										<td>
+											<MudCheckBox class="" value="nextCloud.CheckBoxState" ValueChanged="(bool? val) => OnCheckChanged(nextCloud, val)" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox>
+										</td>
+										<td>
+											<div class="icon-name-file">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>Folder</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>
+												<p>@nextCloud.Name</p>
+											</div>
+										</td>
+										<td class="text-center">
+											@(nextCloud.Status == null ? "---" : nextCloud.Status)
+										</td>
+										<td class="text-center">
+											@(nextCloud.LastSync == null ? "---" : nextCloud.LastSync)
+										</td>
+										<td>
+											<div class="">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>ArrowRight</title><!--!--><path d="M10 17l5-5-5-5v10z"></path><path d="M0 24V0h24v24H0z" fill="none"></path></svg>
+											</div>
+										</td>
+										<td class="action-layer @(IsLoading ? "no-pointer" : string.Empty)" @onclick=" _ => MapsToNextcloudDirectoryAsync(nextCloud)">
+
+										</td>
+									}
+									else
+									{
+										<td>
+											<MudCheckBox Class="" Value="nextCloud.CheckBoxState" ValueChanged="(bool? val) => OnCheckChanged(nextCloud, val)" Size="Size.Small" Color="Color.Primary"></MudCheckBox>
+										</td>
+										<td>
+											<div class="icon-name-file">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>InsertDriveFile</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
+												<p>@nextCloud.Name</p>
+											</div>
+										</td>
+										<td class="text-center">
+											@(nextCloud.Status == null ? "---" : nextCloud.Status)
+										</td>
+										<td class="text-center">
+											@(nextCloud.LastSync == null ? "---" : nextCloud.LastSync)
+										</td>
+										<td></td>
+									}
+								</tr>
+							}
+						}
+						if (item is OneDriveFile oneDrive)
+						{
+							if (oneDrive.Name.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+							{
+								<tr>
+									@if (oneDrive.Type.Equals("folder"))
+									{
+										<td>
+											<MudCheckBox Class="to-right" Value="oneDrive.CheckBoxState" ValueChanged="(bool? val) => OnCheckChanged(oneDrive, val)" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox>
+										</td>
+										<td>
+											<div class="icon-name-file">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>Folder</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path></svg>
+												<p>@oneDrive.Name</p>
+											</div>
+										</td>
+										<td class="text-center">
+											@(oneDrive.Status == null ? "---" : oneDrive.Status)
+										</td>
+										<td class="text-center">
+											@(oneDrive.LastSync == null ? "---" : oneDrive.LastSync)
+										</td>
+										<td>
+											<div class="">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>ArrowRight</title><!--!--><path d="M10 17l5-5-5-5v10z"></path><path d="M0 24V0h24v24H0z" fill="none"></path></svg>
+											</div>
+										</td>
+										<td class="action-layer @(IsLoading ? "no-pointer" : string.Empty)" @onclick=" _ => MapsToOneDriveFolderAsync(oneDrive)">
+										</td>
+									}
+									else
+									{
+										<td>
+											<MudCheckBox Class="to-right" Value="oneDrive.CheckBoxState" ValueChanged="(bool? val) => OnCheckChanged(oneDrive, val)" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox>
+										</td>
+										<td>
+											<div class="icon-name-file">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>InsertDriveFile</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path></svg>
+												<p>@oneDrive.Name</p>
+											</div>
+										</td>
+										<td class="text-center">
+											@(oneDrive.Status == null ? "---" : oneDrive.Status)
+										</td>
+										<td class="text-center">
+											@(oneDrive.LastSync == null ? "---" : oneDrive.LastSync)
+										</td>
+										<td></td>
+									}
+								</tr>
+							}
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="send-btn">
+		<MudButton OnClick="SendFilesList" Disabled="@(!_cbvm.FilesToImport.ExcludedItems.Any() && !_cbvm.FilesToImport.IncludedItems.Any())" Style="border-radius: 50px;margin-top: 10px;" Variant="Variant.Filled" Color="@Color.Primary">@_locals["_import"]</MudButton>
+	</div>
+</div>
+
+
+@code {
+	[Parameter] public bool SyncUrl { get; set; } = true;
+	[Parameter] public EnteryType ListType { get; set; }
+	[Parameter] public bool IsLoading { get; set; }
+	private IReadOnlyList<CloudFileBase> Directories { get; set; } = Array.Empty<CloudFileBase>();
+	private string _search { get; set; } = string.Empty;
+	private List<string> Breadcrumb = new() { "/" };
+	private Dictionary<string, string> _fileIDs = new();
+	private Stack<string> _redo = new();
+	private Stack<string> _undo = new();
+	private string _currentPath = "/";
+	public string CurrentPath => _currentPath;
+	private int _currentPositon = 0;
+	private bool _canUndo => _undo.Count > 0;
+	private bool _canRedo => _redo.Count > 0;
+	public bool? SelectAll { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		if (ListType == EnteryType.None)
+		{
+			var cloudtype = await _saveManager.GetStringByKeyAsync("cloud");
+			Enum.TryParse<EnteryType>(cloudtype, ignoreCase: true, out var value);
+			ListType = value;
+		}
+		switch (ListType)
+		{
+			case EnteryType.NextCloud:
+				await Initialize(NextCloudLoadPathAsync);
+				break;
+			case EnteryType.OneDrive:
+				await Initialize(OneDriveLoadPathAsync);
+				break;
+		}
+		await update();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if(firstRender){
+			await _jsRuntime.InvokeVoidAsync("breadCrumbsEllipsis");
+
+		}
+
+	}
+
+	protected override void OnParametersSet()
+	{
+		update();
+	}
+
+	public void Dispose()
+	{
+		_cbvm.FilesToImport.ExcludedItems.Clear();
+		_cbvm.FilesToImport.IncludedItems.Clear();
+		_fileIDs.Clear();
+	}
+
+	private void GoBackToManage()
+	{
+		NavigationManager.NavigateTo("/res/cloud/manage");
+		Dispose();
+	}
+	private Task update() => InvokeAsync(StateHasChanged);
+
+	private async Task Initialize(Func<string, Task> loadPathAction)
+		=> await loadPathAction(_currentPath);
+
+	private async Task SetLoadingState(Func<Task> action)
+	{
+		if (IsLoading) return;
+		IsLoading = true;
+		update();
+		await action();
+		IsLoading = false;
+		SelectAll = null;
+		update();
+	}
+	private Func<string, Task> GetLoader() => ListType switch
+	{
+		EnteryType.NextCloud => NextCloudLoadPathAsync,
+		EnteryType.OneDrive => OneDriveLoadPathAsync,
+	};
+
+	private async Task Undo()
+	{
+		_redo.Push(CurrentPath);
+		_currentPath = _undo.Pop();
+		await GetLoader()(CurrentPath);
+
+	}
+
+	private async Task Redo()
+	{
+		_undo.Push(CurrentPath);
+		_currentPath = _redo.Pop();
+		await GetLoader()(CurrentPath);
+
+	}
+	private void OnCheckChanged(CloudFileBase file, bool? val)
+	{
+		file.CheckBoxState = val;
+		SelectAll = null;
+		switch (file)
+		{
+			case OneDriveFile oneDriveFile:
+				_odvm.OnSelectOneDriveFile(oneDriveFile);
+				break;
+
+			case NextCloudFile nextCloudFile:
+				_ncvm.OnSelectNextCloudFile(nextCloudFile);
+				break;
+		}
+	}
+
+	private async Task SendFilesList()
+	{
+		string _result = string.Empty;
+		IsLoading = true;
+		switch (ListType)
+		{
+			case EnteryType.NextCloud:
+				_result = await _ncvm.PostSelectedItemsAsync();
+				break;
+			case EnteryType.OneDrive:
+				_result = await _odvm.PostOneDriveItems();
+				break;
+		}
+		IsLoading = false;
+		_sn.SnackBarManager(_result);
+	}
+	private void SetNewAction(string path)
+	{
+		_undo.Push(CurrentPath);
+		_currentPath = path;
+		_redo.Clear();
+	}
+	private async Task ChangeDirectory(string segment)
+	{
+		if (string.IsNullOrEmpty(segment))
+			return;
+
+		var trimmedPath = TrimAfterSegment(segment);
+
+		if (string.IsNullOrEmpty(trimmedPath) || _currentPath.Equals(trimmedPath)) 
+			return;
+
+		SetNewAction(_currentPath);
+		_currentPath = trimmedPath;
+		await GetLoader()(_currentPath);
+	}
+	private string TrimAfterSegment(string key)
+	{
+		int index = _currentPath.IndexOf(key, StringComparison.OrdinalIgnoreCase);
+
+		if (index < 0) 
+			return string.Empty;
+
+		return _currentPath.Substring(0, index + key.Length);
+
+	}
+	private void ChangeAllItemState()
+	{
+		if (SelectAll==null)
+		{
+			SelectAll = true;
+		}
+		else
+		{
+			SelectAll = !SelectAll;
+
+		}
+
+		switch (ListType)
+		{
+			case EnteryType.NextCloud:
+				_ncvm.ChangeAllitemStateNextCloud(SelectAll);
+				break;
+			case EnteryType.OneDrive:
+				_odvm.ChangeAllitemStateOneDrive(SelectAll);
+				break;
+		}
+	}
+	//----------------------------------------------------------------- NextCloud -----------------------------------------------------------------
+	private async Task MapsToNextcloudDirectoryAsync(NextCloudFile folder)
+	{
+		SetNewAction(folder.Path.Substring(0,folder.Path.Length - 1));
+		await NextCloudLoadPathAsync(CurrentPath);
+	}
+
+	private async Task NextCloudLoadPathAsync(string path)
+	{
+		await SetLoadingState(async () =>
+		{
+			var success = await _ncvm.FetchNextcloudDirectoryAsync(_ncvm.NextCloudAccountId, path);
+			Directories = _ncvm.NextCloudDirectories;
+
+		});
+	}
+	//----------------------------------------------------------------- OneDrive -----------------------------------------------------------------
+	private async Task MapsToOneDriveFolderAsync(OneDriveFile folder)
+	{
+		_odvm.OneDriveId = folder.DriveId;
+		var path = string.Empty;
+		path = Path.Combine(Breadcrumb[_currentPositon], folder.Name);
+		// BreadcrumbCorrection(path);
+		if (!_fileIDs.ContainsKey(folder.Name))
+		{
+			_fileIDs.Add(folder.Name, folder.RemoteId);
+			Breadcrumb.Add(path);
+		}
+		SetNewAction(path);
+		await OneDriveLoadPathAsync(path);
+	}
+	private async Task OneDriveLoadPathAsync(string path)
+	{
+		await SetLoadingState(async () =>
+		{
+			var pahtPosition = Breadcrumb.IndexOf(path);
+			var pathSplitedList = path.Split("/");
+			if (pahtPosition < 0)
+			{
+				FileIdFinder(pathSplitedList[^1]);
+			}
+			else
+			{
+				_currentPositon = pahtPosition;
+			}
+
+			//("_currentPositon: " + _currentPositon);
+
+			var remoteId = string.Empty;
+
+			if (!path.Equals("/"))
+			{
+				var lastPAth = pathSplitedList[^1];
+				remoteId = _fileIDs[lastPAth];
+			}
+			var result = await _odvm.GetOneDriveDirectory(remoteId);
+			Directories = _odvm.OneDriveDirectories;
+		});
+	}
+
+	private void FileIdFinder(string name)
+	{
+
+		var File = _odvm.OneDriveDirectories.Find(x => x.Name.Equals(name));
+		var path = Path.Combine(Breadcrumb[^1], File.Name);
+		var isExisted = _fileIDs.TryGetValue(File.Name, out _);
+		if (!isExisted)
+		{
+			_fileIDs.Add(File.Name, File.RemoteId);
+		}
+		Breadcrumb.Add(path);
+		_currentPositon = Breadcrumb.IndexOf(path);
+
+	}
+}

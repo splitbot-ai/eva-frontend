@@ -1,0 +1,136 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class="modal @(Open ? "open" : string.Empty) main">
+	<div @onclick="ToggleOpen" class="backdrop-container"></div>
+	<div class="modal-body">
+		<div class="modal-head">
+			<MudButton OnClick="ToggleOpen">
+				<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>DoubleArrow</title><!--!--><g><rect fill="none" height="24" width="24"></rect><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20.08,11.42l-4.04-5.65C15.7,5.29,15.15,5,14.56,5h0c-1.49,0-2.35,1.68-1.49,2.89L16,12l-2.93,4.11 c-0.87,1.21,0,2.89,1.49,2.89h0c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C20.33,12.23,20.33,11.77,20.08,11.42z"></path><path d="M13.08,11.42L9.05,5.77C8.7,5.29,8.15,5,7.56,5h0C6.07,5,5.2,6.68,6.07,7.89L9,12l-2.93,4.11C5.2,17.32,6.07,19,7.56,19h0 c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C13.33,12.23,13.33,11.77,13.08,11.42z"></path></g></g></svg>
+
+				<h3>@_locals["_rename"]</h3>
+			</MudButton>
+			@* <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoCrawler" Size="Size.Small" Color="Color.Primary" Class="@(HideInfo ? string.Empty :  "hide-the-info-buttons" )" /> *@
+		</div>
+		<div class="modal-content">
+			<div class="disable">
+				<h3>@_locals["_currentName"]</h3>
+				<MudTextField T="string" @bind-Value="@_lg.RenameRoomName" Disabled="true"  Underline="false" Variant="Variant.Filled" Lines="1" />
+			</div>
+
+			<h3>@_locals["_newName"]</h3>
+			<MudTextField T="string" @bind-Value="_newName"  Underline="false" Variant="Variant.Filled" Lines="1" />
+		</div>
+		<div class="modal-foot ">
+			<MudButton OnClick="ToggleOpen" Variant="Variant.Filled">@_locals["_cancel"]</MudButton>
+			<MudButton OnClick="TryToSave" Variant="Variant.Filled" Color="Color.Primary">@_locals["_save"]</MudButton>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public bool Open { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+
+	[Parameter]
+	public bool HideInfo { get; set; }
+
+	public string? theme { get; set; }
+
+	private string _newName { get; set; } = string.Empty;
+
+	private void ToggleOpen()
+	{
+		Open = !Open;
+		OnClose.InvokeAsync(Open);
+	}
+
+	private async Task TryToSave()
+	{
+		if(string.IsNullOrEmpty(_newName.Trim()))
+		{
+			Alert(null);
+			return;
+		}
+		else
+		{
+			bool result = await SaveNewName();
+			if (result)
+			{
+				ToggleOpen();
+				Alert(result);
+				_newName = string.Empty;
+			}
+			else
+			{
+				Alert(result);
+				
+			}
+
+		}
+
+
+	}
+	private async Task<bool> SaveNewName()
+	{
+		return await _vm.RenameChatRoomAsync(_lg.RenameRoomId,_newName);
+		StateHasChanged();
+	}
+
+
+
+
+	private void Alert(bool? error)
+	{
+		if (error is null)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_renameWarn"], Severity.Warning, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else if (error is false)
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		else
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(string.Format(_locals["_renameSucc"], _newName), Severity.Success, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+
+
+
+
+
+}

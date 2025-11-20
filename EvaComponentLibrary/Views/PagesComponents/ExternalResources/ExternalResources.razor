@@ -1,0 +1,106 @@
+﻿@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.EmailComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.CloudComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.CloudComponents.NextCloudComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.CustomInstructionComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.WebCrawlerComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.FileManagerComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.OutLookComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.TrashComponents;
+@using EvaComponentLibrary.Views.PagesComponents.ExternalResources.FavouriteComponents;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject NavigationManager NavigationManager;
+@inject EMailViewModel _evm;
+@inject WebServices _ws;
+
+<div class="main resource-container">
+
+    <MudTabs Centered="true" PanelClass="pa-6" MinimumTabWidth="120px" Ripple="false" @ref="tabs" @bind-ActivePanelIndex="activeIndex">
+        <MudTabPanel OnClick="_ => navigate(_navigateToCloud)" Text="Cloud" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToFile)" Text="@_locals["_docMangag"]" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToWeb)" Text="@_locals["_webSafe"]" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToCustome)" Text="@_locals["_customInst"]" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToOutLook)" Text="Outlook" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToEMAIL)" Text="E-MAIL" BadgeData='"BETA"' BadgeColor="Color.Error" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToFavourite)" Text="@_locals["_memory"]" Icon="@Icons.Material.Filled.BookmarkBorder" />
+        <MudTabPanel OnClick="_ => navigate(_navigateToTrash)" Text="@_locals["_addToBin"]" Icon="@Icons.Material.Outlined.Delete" />
+    </MudTabs>
+    @ActiveTab
+</div>
+
+
+
+
+
+@code {
+    MudTabs tabs ;
+    [Parameter]
+    public string Tab{ get; set; }
+    [Parameter]
+    public string? SubTab { get; set; }
+    private int activeIndex;
+    private string _navigateToCloud = "/res/cloud/add";
+    private string _navigateToFile = "/res/file/add";
+    private string _navigateToWeb = "/res/web/add";
+    private string _navigateToCustome = "/res/instruction/add-manage";
+    private string _navigateToOutLook = "/res/outlook/add-manage";
+    private string _navigateToEMAIL = "/res/mail/add";
+    private string _navigateToFavourite = "/res/favourite/manage";
+    private string _navigateToTrash = "/res/trash/manage";
+    private void navigate(string url){
+        NavigationManager.NavigateTo(url);
+    }
+    protected override async Task OnInitializedAsync(){
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+        _lg.ActivateTab += Activate;
+        _evm.ws = _ws;
+    }
+    protected override void OnParametersSet()
+    {
+        activeIndex = (Tab?.ToLowerInvariant()) switch
+        {
+            "cloud" => 0,
+            "file" => 1,
+            "web" => 2,
+            "instruction" => 3,
+            "outlook" => 4,
+            "mail" or "imap" => 5,
+            "favourite" => 6,
+            "trash" => 7,
+            _ => 0
+        };
+    }
+    private RenderFragment ActiveTab => (Tab?.ToLowerInvariant()) switch
+    {
+        "cloud" => @<Cloud SubTab="@SubTab" />,
+        "nextcloud" =>@<AddNextCloud SubTab="@SubTab" />,
+        "onedrive" =>@<AddOneDrive SubTab="@SubTab" />,
+        "file" => @<File SubTab="@SubTab" />,
+        "web" => @<WebCrawler SubTab="@SubTab" />,
+        "instruction" =>@<CustomInstruction SubTab="@SubTab" />,
+        "mail" => @<EMail SubTab="@SubTab" />,
+        "imap" => @<IMAP SubTab="@SubTab" />,
+        "outlook" => @<OutLook SubTab="@SubTab" />,
+        "favourite" => @<Favourite/>,
+        "trash" => @<Trash/>,
+
+        _ => @<Cloud SubTab="@SubTab" />
+    };
+    private async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+    private void Activate()
+    {
+        tabs.ActivatePanel(0);
+    }
+}

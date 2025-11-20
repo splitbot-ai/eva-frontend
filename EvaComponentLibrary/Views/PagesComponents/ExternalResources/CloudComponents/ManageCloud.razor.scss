@@ -1,0 +1,236 @@
+﻿@import"../../../styles/light-dark.scss";
+
+.main {
+}
+
+.content {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+
+
+    .felx-container {
+        overflow: hidden;
+        height: 100%;
+
+        .scroll-list {
+            /* overflow-y: auto;
+            scrollbar-gutter: stable;
+            height: calc(100dvh - 400px);
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;*/
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            height: calc(100dvh - 350px);
+
+
+            .empty {
+                height: 270px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+
+                p {
+                    color: var(--text-color);
+                    font-family: 'Kanit-Bold';
+                    font-size: 1.17em;
+                }
+
+                img {
+                    width: 70px;
+                    opacity: 0.8;
+                    filter: var(--invert100-img);
+                }
+            }
+
+            .scroll-content {
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+
+                .account-container {
+                    position: relative;
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    margin: 15px;
+                    padding: 8px;
+                    background-color: var(--sidebar-color);
+                    border-radius: 15px;
+                    max-width: 350px;
+                    width: 100%;
+                    min-height: 120px;
+
+                    .logo {
+                        img {
+                            width: 6rem;
+                        }
+                    }
+
+                    .account-info {
+                        display: flex;
+                        row-gap: 8px;
+                        flex-direction: column;
+
+                        h3,h5 {
+                            width: 100px;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 1;
+                            -webkit-box-orient: vertical;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            font-family: roboto-light;
+                            font-size: 1em;
+                        }
+
+
+                        h5 {
+                            font-family: Kanit-Bold;
+                            font-weight: 400;
+                            font-size: 0.8em;
+                        }
+                    }
+
+                    ::deep .delete-btn {
+                        position: absolute;
+                        left: 85%;
+                        top: -5px;
+
+                        .mud-icon-button {
+                            color: var(--text-color) !important;
+                        }
+                    }
+                }
+            }
+        }
+
+        .list-empty {
+            height: 100%;
+        }
+    }
+
+    ::deep .mud-input-control {
+        .mud-input {
+            .mud-input-adornment-icon {
+                fill: var(--text-color);
+                z-index: 2;
+            }
+
+            .mud-input-slot {
+                color: var(--text-color);
+                opacity: .8;
+                z-index: 2;
+            }
+        }
+
+        .mud-input-outlined-border {
+            border-radius: 50px !important;
+            border: 2px solid var(--secondary-color) !important;
+            background-color: var(--secondary-color);
+            margin-bottom: 5px !important;
+        }
+
+        .mud-input-adornment {
+            .mud-icon-root {
+                fill: var(--text-color) !important;
+            }
+        }
+
+        .mud-input {
+            font-family: "Kanit-Bold";
+        }
+    }
+
+    ::deep .mud-switch {
+        margin: 15px 0px;
+
+        .mud-switch-span .mud-switch-track {
+            background-color: var(--highlight-color);
+        }
+    }
+
+    ::deep .mud-button-filled.mud-button-filled-primary {
+        border-radius: 50px;
+        background-color: var(--highlight-color);
+        margin-top: 10px;
+
+        &:disabled {
+            background-color: var(--highlight-color) !important;
+            opacity: .5;
+        }
+    }
+
+    ::deep .mud-button-outlined.mud-button-outlined-info {
+        border-radius: 50px;
+        margin-top: 5px;
+        color: var(--highlight-color);
+        border: 1px solid var(--highlight-color);
+
+        &:disabled {
+            background-color: var(--highlight-color) !important;
+            opacity: .5;
+        }
+    }
+}
+
+::deep .mud-input-control >
+.mud-input-control-input-container >
+.mud-input-label-inputcontrol {
+    color: var(--text-color);
+    font-family: 'Kanit-Bold';
+    background-color: unset;
+}
+
+::deep .mud-input:focus-within ~ label.mud-input-label.mud-input-label-inputcontrol {
+    color: var(--text-color) !important;
+}
+
+::deep .icon {
+    color: var(--text-color);
+}
+
+
+::deep .modal-tabs.slide {
+    .mud-tabs-tabbar {
+
+        .mud-tabs-tabbar-inner {
+            .mud-tabs-tabbar-content {
+                .mud-tabs-tabbar-wrapper {
+                    ::after {
+                        transform: translateX(100%);
+                    }
+                }
+            }
+        }
+    }
+}
+
+::deep .mud-list {
+    .mud-list-item {
+        .mud-list-item-text {
+            .mud-typography,
+            .mud-typography-body1 {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            a {
+                flex: 1;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 160px;
+                height: 1.2em;
+                white-space: nowrap;
+            }
+
+            .del-btn {
+                color: var(--text-color);
+            }
+        }
+    }
+}

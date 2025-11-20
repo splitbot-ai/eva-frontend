@@ -1,0 +1,39 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class="modal open main">
+	<div @onclick="ToggleModal" class="backdrop-container"></div>
+	<div class="modal-body" style="max-height:@MaxHeight;">
+		<div class="modal-head">
+			<MudButton OnClick="ToggleModal">
+				<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>DoubleArrow</title><!--!--><g><rect fill="none" height="24" width="24"></rect><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20.08,11.42l-4.04-5.65C15.7,5.29,15.15,5,14.56,5h0c-1.49,0-2.35,1.68-1.49,2.89L16,12l-2.93,4.11 c-0.87,1.21,0,2.89,1.49,2.89h0c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C20.33,12.23,20.33,11.77,20.08,11.42z"></path><path d="M13.08,11.42L9.05,5.77C8.7,5.29,8.15,5,7.56,5h0C6.07,5,5.2,6.68,6.07,7.89L9,12l-2.93,4.11C5.2,17.32,6.07,19,7.56,19h0 c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C13.33,12.23,13.33,11.77,13.08,11.42z"></path></g></g></svg>
+				<h3>@_locals[Name]</h3>
+			</MudButton>
+		</div>
+		<div class="modal-content">
+			@Body
+		</div>
+		<div class="modal-foot ">
+			@Footer
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[Parameter] public RenderFragment? Body { get; set; }
+	[Parameter] public RenderFragment? Footer { get; set; }
+	[Parameter] public string MaxHeight { get; set; }
+	[Parameter] public string Name { get; set; }
+	[Parameter] public EventCallback<MouseEventArgs> ToggleModal { get; set; }
+	[Parameter] public bool HideInfo { get; set; }
+}

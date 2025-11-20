@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvaComponentLibrary", "EvaComponentLibrary\EvaComponentLibrary.csproj", "{9C40F9FE-C86D-480D-A9D2-39DFD1E4F96F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvaWASM", "EvaWASM\EvaWASM.csproj", "{2F2E7EA2-D1F2-4AC4-B94D-425591898364}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvaMobil", "EvaMobil\EvaMobil.csproj", "{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug-EVA|Any CPU = Debug-EVA|Any CPU
+		Release-EVA|Any CPU = Release-EVA|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C40F9FE-C86D-480D-A9D2-39DFD1E4F96F}.Debug-EVA|Any CPU.ActiveCfg = Debug-EVA|Any CPU
+		{9C40F9FE-C86D-480D-A9D2-39DFD1E4F96F}.Debug-EVA|Any CPU.Build.0 = Debug-EVA|Any CPU
+		{9C40F9FE-C86D-480D-A9D2-39DFD1E4F96F}.Release-EVA|Any CPU.ActiveCfg = Release-EVA|Any CPU
+		{9C40F9FE-C86D-480D-A9D2-39DFD1E4F96F}.Release-EVA|Any CPU.Build.0 = Release-EVA|Any CPU
+		{2F2E7EA2-D1F2-4AC4-B94D-425591898364}.Debug-EVA|Any CPU.ActiveCfg = Debug-EVA|Any CPU
+		{2F2E7EA2-D1F2-4AC4-B94D-425591898364}.Debug-EVA|Any CPU.Build.0 = Debug-EVA|Any CPU
+		{2F2E7EA2-D1F2-4AC4-B94D-425591898364}.Release-EVA|Any CPU.ActiveCfg = Release-EVA|Any CPU
+		{2F2E7EA2-D1F2-4AC4-B94D-425591898364}.Release-EVA|Any CPU.Build.0 = Release-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Debug-EVA|Any CPU.ActiveCfg = Debug-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Debug-EVA|Any CPU.Build.0 = Debug-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Debug-EVA|Any CPU.Deploy.0 = Debug-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Release-EVA|Any CPU.ActiveCfg = Release-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Release-EVA|Any CPU.Build.0 = Release-EVA|Any CPU
+		{A8E6A94F-E13D-4ED6-A61D-155FE82B0BC9}.Release-EVA|Any CPU.Deploy.0 = Release-EVA|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C7989431-CECA-4863-9BF7-1C3D21AE9D48}
+	EndGlobalSection
+EndGlobal

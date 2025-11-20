@@ -1,0 +1,256 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Models.References;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject NavigationManager _nav;
+@inject ISnackbar Snackbar;
+<div class="main drawer @(Open? " open-drawer" : string.Empty) ">
+	<div class="backdrop-container  @(Open? " open-backdrop-container" : string.Empty)" @onclick=" ToggleModal"></div>
+	<div class="info-container @(Open? "open-info-container" : string.Empty)">
+
+		<div class="info-header">
+			<h3><MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Primary" OnClick="ToggleModal" aria-label="github" />@_locals["_sourcesList"]</h3>
+		</div>
+
+		<div class="external-container">
+			<div class="sources-list-container">
+				@foreach (var msg in MessageItems)
+				{
+					if (string.IsNullOrEmpty(MessageId))
+						break;
+
+					if (MessageId.Equals(msg.Id))
+					{
+
+						foreach (var Refe in msg.References)
+						{
+							@if (Refe is Links link)
+							{
+
+								<div class="source-item-container">
+											@if (@link.Number > 0.0)
+											{
+												<p class="reference-number">@link.Number</p>
+											}
+									<svg @onclick="_ => ExtendList(link)" class="mud-icon-root mud-svg-icon mud-icon-size-medium arrow-down @(link.Name.Length < 25 ? "arrow-hide" : string.Empty) @(link.IsExtended ? "arrow-up" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>KeyboardArrowDown</title><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>
+									<div class="source-item @(link.IsExtended ? "extended" : string.Empty)">
+										<a class="source-link  @(link.Name.Length > 25 ? "left-space" : string.Empty)" style="@(string.IsNullOrEmpty(link.Url) ? "pointer: none;" : string.Empty)" target="@(Platform.Contains("android") || Platform.Contains("web") ? "_blank" : string.Empty)" href="@link.Url"></a>
+										<div class="display-info">
+											<div class="item-head  @(link.Name.Length > 25 ? "margin-left" : string.Empty)">
+											@if (!string.IsNullOrEmpty(link.Icon))
+
+											{
+												string Icon = @link.Icon.Trim('\'');
+												if (!Icon.Contains("https://") && !string.IsNullOrEmpty(Icon))
+												{
+													Icon = $"https://{Icon}";
+												}
+												<img src="@Icon">
+											}
+											else
+											{
+
+												<MudIcon Icon="@Icons.Material.Filled.Language" Size="Size.Small"></MudIcon>
+											}
+											<h4>@link.Name</h4>
+
+
+										</div>
+											<div class="item-tail">
+												@link.Name
+									</div>
+								</div>
+									</div>
+								</div>
+							}
+							@if (Refe is Files file)
+							{
+								var name = file.Name.Replace("_", "").Replace("-", "");
+								//(file.Number);
+								<div class="source-item-container">
+									<p class="reference-number">@file.Number</p>
+									<svg @onclick="_ => ExtendList(file)" class="mud-icon-root mud-svg-icon mud-icon-size-medium arrow-down  @(file.Name.Length < 25 ? "arrow-hide" : string.Empty)  @(file.IsExtended ? "arrow-up" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>KeyboardArrowDown</title><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>
+									<div class="source-item @(file.IsExtended ? "extended" : string.Empty) @(_isPDFLoading ? "disable" : string.Empty)">
+										<a class="source-link  @(file.Name.Length > 25 ? "left-space" : string.Empty)" href="javascript:void(0);" @onclick="_ => OpenPDFViewer(file.FileId, name, file.Number, file.Chunks)"></a>
+									<div class="display-info">
+											<div class="item-head  @(file.Name.Length > 25 ? "margin-left" : string.Empty)">
+											<div class="script">
+												<p class="reference-number">@file.Number</p>
+												<img class="pre-show" src="_content/EvaComponentLibrary/img/adobe.png" />
+													<h4 class="h4-pdf">@file.Name</h4>
+											</div>
+											@if (_isPDFLoading && file.Number.Equals(_fileNumber))
+											{
+												<MudProgressCircular Color="Color.Info" Indeterminate="true" Size="Size.Small" />
+											}
+										</div>
+											<div class="item-tail">
+												@file.Name
+									</div>
+
+								</div>
+									</div>
+								</div>
+							}
+							@if (Refe is Emails email)
+							{
+								<div class="source-item-container">
+									<p class="reference-number">@email.Number</p>
+									<svg @onclick="_ => ExtendList(email)" class="mud-icon-root mud-svg-icon mud-icon-size-medium arrow-down @(email.Name.Length < 25 ? "arrow-hide" : string.Empty) @(email.IsExtended ? "arrow-up" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>KeyboardArrowDown</title><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>
+									<div class="source-item @(email.IsExtended ? "extended" : string.Empty)">
+									<div class="display-info">
+											<div class="item-head  @(email.Name.Length > 25 ? "margin-left" : string.Empty)">
+											<div class="script">
+												<p class="reference-number">@email.Number</p>
+												<img class="pre-show" src="_content/EvaComponentLibrary/img/message.png" />
+												<h4>@email.Name</h4>
+											</div>
+											</div>
+											<div class="item-tail">
+												@{
+													var Splited = @email.Name.Split("-");
+													var SplitedName = Splited[0].Trim();
+													var SplitedSubject = Splited[1].Trim();
+
+													<ul>
+														<li>@SplitedName</li>
+														<li>@SplitedSubject</li>
+
+													</ul>
+												}
+												
+											</div>
+
+										</div>
+									</div>
+								</div>
+							}
+							@if (Refe is Chat chat)
+							{
+								 chat.Name = chat.Name.Replace("Past Conversation:", string.Empty).Replace("\"",string.Empty);
+								<div class="source-item-container">
+									@if (@chat.Number > 0.0)
+									{
+										<p class="reference-number">@chat.Number</p>
+									}
+									<svg @onclick="_ => ExtendList(chat)" class="mud-icon-root mud-svg-icon mud-icon-size-medium arrow-down @(chat.Name.Length < 25 ? "arrow-hide" : string.Empty) @(chat.IsExtended ? "arrow-up" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>KeyboardArrowDown</title><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>
+									<div class="source-item @(chat.IsExtended ? "extended" : string.Empty)" @onclick="_ =>GoToReferenceRoom(chat.RoomId)">
+										<div class="display-info">
+											<div class="item-head  @(chat.Name.Length > 25 ? "margin-left" : string.Empty)">
+												<img class="pre-show" src="_content/EvaComponentLibrary/img/conversation.png" />
+												<h4>@chat.Name.Replace("Past Conversation:", " ")</h4>
+											</div>
+											<div class="item-tail">
+												@chat.Name
+											</div>
+										</div>
+									</div>
+								</div>
+							}
+
+						}
+					}
+				}
+
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public bool Open { get; set; } = false;
+
+	[Parameter]
+	public List<Message> MessageItems { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> PDFViewer { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> Loading { get; set; }
+
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+
+	[Parameter]
+	public string? MessageId { get; set; }
+
+	[Parameter]
+	public string Platform { get; set; }
+
+	private Reference _lastObj { get; set; } = new();
+	private bool _isPDFLoading { get; set; }
+	private double _fileNumber { get; set; }
+	private string text = "Vorwort";
+
+	private async Task OpenPDFViewer(string id, string name, double number, List<string> chunk)
+	{
+		_fileNumber = (int)number;
+		_isPDFLoading = true;
+		await Task.Delay(2000);
+		var pdf = await _uc.PostFileWithAnnotation(id, chunk);
+		if (!pdf)
+		{
+			_isPDFLoading = false;
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_pdf"], Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+			_ = Loading.InvokeAsync(false);
+			return;
+		}
+		_ = PDFViewer.InvokeAsync(true);
+		_ = OnClose.InvokeAsync(false);
+		_ = Loading.InvokeAsync(_isPDFLoading);
+		// var cleanChunk = _uc.ChunksNormalizer(chunk);
+		// cleanChunk.ForEach(x =>//("cleanChunk " + x));
+		_ = _jsRuntime.InvokeVoidAsync("loadPdfIntoIframe", _uc.PDFBase64, _uc.PageNum);
+		_uc.PDFName = name;
+		_isPDFLoading = false;
+		_fileNumber = 0;
+		_ = Loading.InvokeAsync(_isPDFLoading);
+	}
+	public void ToggleModal()
+	{
+		Open = !Open;
+		OnClose.InvokeAsync(Open);
+		_lastObj.IsExtended = false;
+	}
+	public void ExtendList(Reference extend)
+	{
+		if (!extend.Equals(_lastObj))
+		{
+			_lastObj.IsExtended = false;
+			_lastObj = extend;
+
+		}
+		extend.IsExtended = !extend.IsExtended;
+
+	}
+
+	public async void GoToReferenceRoom(string roomId)
+	{
+		var referenceRoom =_vm.AllChatRoom.FirstOrDefault(x => x.RoomId.Equals(roomId));
+		if (referenceRoom != null)
+		{
+			await _vm.LoadRoomAsync(referenceRoom);
+			_lg.Connected = true;
+			_lg.TriggerSourcesList?.Invoke(false);
+			_nav.NavigateTo($"/chat/{roomId}");
+		}
+	}
+}

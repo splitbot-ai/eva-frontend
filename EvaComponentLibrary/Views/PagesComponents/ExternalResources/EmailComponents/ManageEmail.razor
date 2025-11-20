@@ -1,0 +1,195 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using EvaComponentLibrary.Models.Mail;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.EMailViewModel _evm;
+@inject ISnackbar Snackbar;
+
+<div class="outer-container">
+    <div class=" main content">
+    <div class="felx-container">
+        <MudTextField Class="searchbar"
+        @bind-Value="_search"
+        Label="@_locals["_search"]"
+        Immediate="true"
+        Variant="Variant.Outlined"
+        Adornment="Adornment.End"
+        AdornmentIcon="@Icons.Material.Filled.Search"
+        AdornmentColor="Color.Secondary" 
+        autocomplete="off"/>
+        @if (IsLoading && !_evm.EmailList.Any())
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        }
+        <div class="scroll-list">
+            @if (!_evm.EmailList.Any())
+            {
+                <div class="empty">
+                    <img src="_content/EvaComponentLibrary/img/box.png" />
+                    <p>@_locals["_empty"]</p>
+                </div>
+            }
+
+            <div class="scroll-content">
+                <MudList T="string">
+                    <Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize Context="mail" Items="_evm.EmailList">
+                        @if (mail.EMail.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+                        {
+                            <div class="email-elem-container">
+                                <section>
+                                    <div class="email-address">@mail.EMail</div>
+                                    <MudIconButton Class="del-btn"
+                                    OnClick="_ => DeleteAccount(mail)"
+                                    Icon="@Icons.Material.Filled.Delete">
+                                    </MudIconButton>
+                                </section>
+                                <div class="option-container-1">
+                                    <MudNumericField Immediate="true" Min="1" Max="30" @bind-Value="mail.CrawlRetention"
+                                    @bind-Value:after="() => OnRetentionChanged(mail,mail.CrawlRetention)" Variant="Variant.Outlined" />
+                                    <MudChipSet T="Color" CheckMark SelectionMode="SelectionMode.ToggleSelection">
+                                        <MudChip Text="purple" Selected="@(mail.Active)" Color="@Color.Success" Value="@Color.Primary" OnClick=" _ => ActivateAccount(mail)">
+                                            <p>@_locals["_active"]</p>
+                                        </MudChip>
+                                    </MudChipSet>
+                                    <MudChipSet T="Color" CheckMark SelectionMode="SelectionMode.ToggleSelection">
+                                        <MudChip Text="purple" Selected="@(mail.Attachment)" Color="@Color.Success" Value="@Color.Primary" OnClick=" _ => SetAttachment(mail)">
+                                            <p>@_locals["_attach"]</p>
+                                        </MudChip>
+                                    </MudChipSet>
+                                </div>
+                                <div class="option-container-2">
+                                    <div @onclick="_ => SetCrawlRetention(mail)" class="save-btn @(mail.IsModified ? "appear" : string.Empty)">
+                                        <p>@_locals["_save"]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+                </MudList>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+    public bool ValueIsChanged = false;
+    private string _search = string.Empty;
+    private string _AccountId = string.Empty;
+    private int _intValue;
+    public int intValue {
+        get => _intValue;
+        set 
+        {
+            if (_intValue != value)
+            {
+                _intValue = value;
+                ValueIsChanged = true;
+
+            }
+        } 
+    }
+
+    void OnRetentionChanged(Email mail, int retention)
+    {
+       //(mail.CrawlRetention);
+        mail.IsModified = true;
+
+    }
+    private async Task SetCrawlRetention(Email mail)
+    {
+        var result = await _evm.SetCrawlRetention(mail.AccountID, mail.CrawlRetention);
+        if(result){
+            mail.IsModified = false;
+            Alert(result, "_succChange");
+            return;
+        }
+        Alert(result, "_genError");
+        return;
+
+    }
+    private async Task ActivateAccount(Email mail)
+    {
+        mail.Active = !mail.Active;
+        var result = await _evm.ActivateAccount(mail.AccountID, mail.Active);
+        if (result & mail.Active)
+        {
+            Alert(result, "_syncEmail");
+            return;
+        }
+        if (result & !mail.Active)
+        {
+            Alert(result, "_unsyncEmail");
+            return;
+        }
+        mail.Active = !mail.Active;
+        Alert(result, "_genError");
+        return;
+    }
+    private async Task SetAttachment(Email mail){
+        mail.Attachment = !mail.Attachment;
+        var result = await _evm.SetAttachment(mail.AccountID, mail.Attachment);
+        if (result & mail.Attachment)
+        {
+            Alert(result, "_attachmentAct");
+            return;
+        }
+        if (result & !mail.Attachment)
+        {
+            Alert(result, "_attachmentDea");
+            return;
+        }
+        mail.Attachment = !mail.Attachment;
+        Alert(result, "_genError");
+        return;
+
+    }
+    private async Task DeleteAccount(Email mail)
+    {
+        var result = await _evm.DeleteAccount(mail.AccountID);
+        if(result){
+            _ = _evm.GetMailAccounts();
+            Alert(result, "_succDelete");
+            return;
+        }
+        Alert(result, "_genError");
+        return;
+    }
+
+    private void Alert(bool succ, string message)
+    {
+        if(succ)
+        {
+
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(_locals[message], Severity.Success, config =>
+            {
+                config.VisibleStateDuration = 1500;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+
+            });
+        }
+        else
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(_locals[message], Severity.Error, config =>
+            {
+                config.VisibleStateDuration = 1500;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+
+            });
+        }
+    }
+}

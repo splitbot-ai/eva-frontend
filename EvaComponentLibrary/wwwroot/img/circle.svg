@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #d8d8d8;
+        font-family: FontAwesome6Free-Regular, 'Font Awesome 6 Free';
+        font-size: 115.15px;
+      }
+
+      .cls-1, .cls-2 {
+        isolation: isolate;
+      }
+    </style>
+  </defs>
+  <g id="circle" class="cls-2">
+    <text class="cls-1" transform="translate(6.43 109.26)"><tspan x="0" y="0">circle</tspan></text>
+  </g>
+</svg>

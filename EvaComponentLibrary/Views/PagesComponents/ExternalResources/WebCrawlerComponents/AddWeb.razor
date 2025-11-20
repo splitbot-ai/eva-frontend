@@ -1,0 +1,81 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class=" mian content">
+    <MudTextField Class="searchbar"
+    @bind-Value="_link"
+    Label="URL/LINK"
+    Immediate="true"
+    Variant="Variant.Outlined"
+    Adornment="Adornment.End"
+    AdornmentIcon="@Icons.Material.Filled.Save"
+    AdornmentColor="Color.Secondary"
+                  autocomplete="off" />
+    <MudSwitch @bind-Value="_subDomains" Color="Color.Primary" Label="@_locals["_subDomain"]" />
+    <MudButton OnClick="AddNewWebsite" Disabled="@(_isSending || string.IsNullOrEmpty(_link))"
+    Variant="Variant.Filled" Color="@Color.Primary" Icon="@Icons.Material.Filled.Save">
+        @_locals["_webSafe"]
+    </MudButton>
+</div>
+
+@code{
+    private string _link = string.Empty;
+    private bool _subDomains = false;
+    private bool _isSending = false;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+    }
+    private async void AddNewWebsite()
+    {
+        _isSending = true;
+        StateHasChanged();
+        bool result = await _vm.AddNewSite(_link, _subDomains ? 2 : 1);
+
+        _link = string.Empty;
+        _isSending = false;
+        StateHasChanged();
+        if (result)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(string.Format(_locals["_succUpload"], _locals["_website"]), Severity.Success, config =>
+            {
+                config.VisibleStateDuration = 1500;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+
+            });
+            update();
+        }
+        else
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+            {
+                config.VisibleStateDuration = 1500;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+            });
+        }
+    }
+
+    private async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}

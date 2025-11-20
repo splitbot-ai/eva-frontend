@@ -1,0 +1,92 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using System.Net.Http.Headers
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject MySnackBar _sn;
+<div class="outer-container">
+    <div class=" main content">
+        <div class="felx-container">
+            <MudTextField Class="searchbar"
+            @bind-Value="_search"
+            Label="@_locals["_search"]"
+            Immediate="true"
+            Variant="Variant.Outlined"
+            Adornment="Adornment.End"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            AdornmentColor="Color.Secondary" 
+            autocomplete="off"/>
+            @if (IsLoading && !_uc.FilesContainer.Any())
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+            }
+            <div class="scroll-list">
+                @if (!_uc.FilesContainer.Any())
+                {
+                    <div class="empty">
+                        <img src="_content/EvaComponentLibrary/img/box.png" />
+                        <p>@_locals["_empty"]</p>
+                    </div>
+                }
+
+                <div class="scroll-content">
+                    <MudList T="string">
+                        <Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize Context="doc" Items="_uc.FilesContainer">
+
+                            @if (doc.Name.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+                            {
+                                <MudListItem>
+                                    <ChildContent>
+                                        <p>@doc.Name</p>
+
+                                        <MudIconButton Class="del-btn"
+                                        Icon="@Icons.Material.Filled.Delete"
+                                        OnClick="_ => DeleteFileAsync(doc)">
+                                        </MudIconButton>
+                                    </ChildContent>
+                                </MudListItem>
+                            }
+
+                        </Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+                    </MudList>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; }
+    private string _search = string.Empty;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+    }
+    private async void DeleteFileAsync(FileContainer file)
+    {
+        //TODO
+        var result = await _uc.DeleteFileAsync(file.Id);
+        if (!result)
+        {
+            _sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+        }
+        update();
+    }
+    public async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}

@@ -1,0 +1,15 @@
+﻿@page "/agent"
+@page "/agent/{sub}"
+@using EvaComponentLibrary.Views.PagesComponents.AgentsComponent;
+
+
+	<CascadingValue Name="SubPages" Value="Sub">
+		<Agents/>
+	</CascadingValue>
+
+@code {
+	[Parameter]
+	public string? Sub { get; set; } = string.Empty;
+	
+
+}

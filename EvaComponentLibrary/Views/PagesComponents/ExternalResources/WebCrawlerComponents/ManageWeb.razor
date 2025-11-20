@@ -1,0 +1,115 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class="main content">
+	<div class="felx-container">
+		<MudTextField Class="searchbar"
+					  @bind-Value="_search"
+					  Label="@_locals["_search"]"
+					  Immediate="true"
+					  Variant="Variant.Outlined"
+					  Adornment="Adornment.End"
+					  AdornmentIcon="@Icons.Material.Filled.Search"
+					  AdornmentColor="Color.Secondary"
+					  autocomplete="off" />
+		@if (IsLoading && !_vm.SitesSaved.Any())
+		{
+			<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+		}
+		<div class="scroll-list">
+			@if (!_vm.SitesSaved.Any())
+			{
+				<div class="empty">
+					<img src="_content/EvaComponentLibrary/img/box.png" />
+					<p>@_locals["_empty"]</p>
+				</div>
+			}
+			<div class="scroll-content">
+				<MudList T="string">
+					<Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize Context="web" Items="_vm.SitesSaved">
+						@if (web.Url.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+						{
+							<MudListItem>
+								<ChildContent>
+									<a href="@web.Url" target="_blank">@web.Url</a>
+									<p class="@(!web.ShouldRefresh ? "hide" : string.Empty) interval">
+										@_locals["_daily"]
+									</p>
+									<MudToggleIconButton Toggled="!web.ShouldRefresh"
+														 Icon="@Icons.Material.Filled.Sync"
+														 Color="@Color.Success"
+														 ToggledChanged="_ => ToggleSync(web)"
+														 ToggledIcon="@Icons.Material.Filled.SyncDisabled"
+														 ToggledColor="@Color.Error" />
+									<div class="legend">
+										@if (web.Depth > 1)
+										{
+											<MudIcon Icon="@Icons.Material.Filled.DynamicFeed" Color="Color.Tertiary"></MudIcon>
+										}
+									</div>
+									<MudIconButton Class="del-btn"
+												   Icon="@Icons.Material.Filled.Delete"
+												   OnClick="_ => DeleteWebsiteAsync(web.Id)">
+									</MudIconButton>
+
+								</ChildContent>
+							</MudListItem>
+						}
+					</Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+
+				</MudList>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public bool IsLoading { get; set; }
+	private string _search = string.Empty;
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+	}
+	private async void ToggleSync(Website site)
+	{
+		site.ShouldRefresh = !site.ShouldRefresh;
+		var updated = await _vm.UpdateSync(site);
+		_ = InvokeAsync(StateHasChanged);
+
+	}
+	private async void DeleteWebsiteAsync(string id)
+	{
+		string result = await _vm.DeleteWebsiteAsync(id);
+		if (string.IsNullOrEmpty(result))
+		{
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+			{
+				config.VisibleStateDuration = 1500;
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+		update();
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+}

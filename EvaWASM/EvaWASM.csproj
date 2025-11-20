@@ -1,0 +1,93 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <Configurations>Debug-EVA;Release-EVA</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+    <Content Remove="Pages\Test.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.7" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.7" />
+    <PackageReference Include="MudBlazor" Version="8.12.0" />
+    <PackageReference Include="MudBlazor.Markdown" Version="8.11.0" />
+    <PackageReference Include="Solutaris.InfoWARE.ProtectedBrowserStorage" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EvaComponentLibrary\EvaComponentLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+	<PropertyGroup>
+		<!-- Other properties -->
+		<NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<Content Update="Pages\PreLoadPage.razor">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+	</ItemGroup>
+	
+
+	
+	<ItemGroup>
+		  <!-- rekursiv *alle* Dateien des aktuell gewählten Brands -->
+		<BrandFiles Include="AssetsForWhiteLabel\$(Brand)\**\*.*" />
+	</ItemGroup>
+	
+	<PropertyGroup Condition="'$(Brand)' == '' And $([System.String]::Copy($(Configuration)).Contains('-'))">
+		<Brand>$([System.String]::Copy($(Configuration)).Split('-')[1])</Brand>
+	</PropertyGroup>
+
+	<Target Name="ApplyBrandAssets" BeforeTargets="BeforeBuild">
+		<Message Importance="high" Text="Branding: $(Brand) – kopiere %(BrandFiles.Count) Dateien" />
+
+		<Copy SourceFiles="@(BrandFiles)" DestinationFiles="@(BrandFiles -> '%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+
+	</Target>
+
+	<ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Test.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Test.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\favicon.png" />
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\icon-192.png" />
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\icon-512.png" />
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\index.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="Pages\Test.razor" />
+  </ItemGroup>
+
+
+
+	<PropertyGroup>
+		<BlazorCacheBootResources>false</BlazorCacheBootResources>
+	</PropertyGroup>
+
+</Project>

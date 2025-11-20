@@ -1,0 +1,146 @@
+﻿@import "../../../styles/light-dark.scss";
+.main{
+
+}
+.content {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    max-width: 540px;
+
+    ::deep.mud-typography {
+        display: flex;
+        align-items: center;
+        column-gap: 5px;
+    }
+
+    ::deep.mud-switch-base {
+        top: 2px;
+        left: 2px;
+    }
+
+    ::deep .mud-primary {
+        background-color: var(--highlight-color) !important;
+    }
+
+    ::deep.mud-primary-text {
+        color: #eee !important;
+    }
+
+    ::deep.mud-switch-span .mud-switch-track {
+        background-color: var(--text-color);
+        border-radius: 15px
+    }
+
+    ::deep.mud-switch-span-medium.mud-switch-span {
+        padding: 8px;
+    }
+
+    ::deep.mud-switch-button .mud-switch-thumb-medium {
+        width: 16px;
+        height: 16px;
+    }
+
+    ::deep .mud-input-control {
+        .mud-input {
+            .mud-input-adornment-icon {
+                fill: var(--text-color);
+                z-index: 2;
+            }
+
+            .mud-input-slot {
+                color: var(--text-color);
+                opacity: .8;
+                z-index: 2;
+            }
+        }
+
+        .mud-input-outlined-border {
+            border-radius: 50px !important;
+            border: 2px solid var(--secondary-color) !important;
+            background-color: var(--secondary-color);
+            margin-bottom: 5px !important;
+        }
+
+        .mud-input-adornment {
+            .mud-icon-root {
+                fill: var(--text-color) !important;
+            }
+        }
+
+        .mud-input {
+            font-family: "Kanit-Bold";
+        }
+    }
+
+    ::deep .mud-switch {
+        margin: 15px 0px;
+    }
+
+    ::deep .mud-button-filled.mud-button-filled-primary {
+        border-radius: 50px;
+        background-color: var(--highlight-color);
+        margin-top: 10px;
+        box-shadow: unset;
+
+        &:disabled {
+            background-color: var(--highlight-color) !important;
+            opacity: .5;
+        }
+    }
+}
+::deep .mud-input-control >
+.mud-input-control-input-container >
+.mud-input-label-inputcontrol {
+    color: var(--text-color);
+    font-family: 'Kanit-Bold';
+    background-color:unset;
+}
+::deep .mud-input:focus-within ~ label.mud-input-label.mud-input-label-inputcontrol {
+    color: var(--text-color) !important;
+}
+::deep .icon {
+    color: var(--text-color);
+}
+
+
+::deep .modal-tabs.slide {
+    .mud-tabs-tabbar {
+
+        .mud-tabs-tabbar-inner {
+            .mud-tabs-tabbar-content {
+                .mud-tabs-tabbar-wrapper {
+                    ::after {
+                        transform: translateX(100%);
+                    }
+                }
+            }
+        }
+    }
+}
+::deep .mud-list {
+    .mud-list-item {
+        .mud-list-item-text {
+            .mud-typography,
+            .mud-typography-body1 {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            a {
+                flex: 1;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 160px;
+                height: 1.2em;
+                white-space: nowrap;
+            }
+
+            .del-btn {
+                color: var(--text-color);
+            }
+        }
+    }
+}

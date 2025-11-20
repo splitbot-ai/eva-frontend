@@ -1,0 +1,136 @@
+﻿﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.Agent
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Views.Components;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.Extensions.Options;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.ScheduledTaskViewModel _stvm;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.MonitoringViewModel _monitorvm;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject NavigationManager NavigationManager;
+@inject MySnackBar _sn;
+@inject ISnackbar Snackbar;
+@inject IOptions<HostSettings> _hostSettings;
+
+
+<div class="component-wrapper">
+	<section>
+		<h3>@_locals["_agent"]</h3>
+		<div class="agent-wrapper">
+			<CardAgent Name="@_locals["_agentGen"]" OnClick="@(_ => NavigateTo(_customAgent))">
+				<svg class="expert-agent-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M3 11a7 7 0 0 1 13.79-1.71c.476.228.882.576 1.18 1.006a8 8 0 1 0-13.63 6.359a.5.5 0 0 0 .707-.707A6.98 6.98 0 0 1 3 11m11.637-1.874A5.002 5.002 0 0 0 5 11c0 1.378.558 2.627 1.46 3.531a.5.5 0 0 0 .708-.706a4 4 0 1 1 6.57-4.253a3 3 0 0 1 .899-.446M8 11a2 2 0 1 1 4 0a2 2 0 0 1-4 0m2-1a1 1 0 1 0 0 2a1 1 0 0 0 0-2m7.5 2a2 2 0 1 1-4 0a2 2 0 0 1 4 0m1.5 4.5c0 1.245-1 2.5-3.5 2.5S12 17.75 12 16.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5" stroke-width="0.5" stroke="currentColor" /></svg>
+			</CardAgent>
+			<CardAgent Name="@_locals["_agentWeb"]" OnClick="@(_ => NavigateTo(_webAgent))">
+				<svg class="expert-agent-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M11.313 17.893q-.642.106-1.313.107a8 8 0 1 1 7.993-7.669a3 3 0 0 0-1.02-.945A7 7 0 0 0 16.54 7.5h-2.733c.097.608.16 1.247.183 1.907c-.4.233-.74.556-.994.94Q13 10.175 13 10c0-.883-.073-1.725-.206-2.5H7.206A15 15 0 0 0 7 10c0 .883.073 1.725.206 2.5h5.335c.06.359.185.696.36 1H7.42c.153.59.342 1.126.56 1.592C8.592 16.41 9.342 17 10 17c.32 0 .663-.14 1-.437c.01.453.11.907.313 1.33m.709-12.985C11.407 3.59 10.657 3 10 3s-1.407.59-2.022 1.908A9.3 9.3 0 0 0 7.42 6.5h5.162a9.3 9.3 0 0 0-.56-1.592M6.389 6.5c.176-.743.407-1.422.683-2.015c.186-.399.401-.773.642-1.103A7.02 7.02 0 0 0 3.936 6.5zM6 10c0-.87.067-1.712.193-2.5H3.46A7 7 0 0 0 3 10c0 .88.163 1.724.46 2.5h2.733A16 16 0 0 1 6 10m1.072 5.515a10.5 10.5 0 0 1-.683-2.015H3.936a7.02 7.02 0 0 0 3.778 3.118a6.6 6.6 0 0 1-.642-1.103M16.064 6.5a7.02 7.02 0 0 0-3.778-3.118c.241.33.456.704.642 1.103c.276.593.507 1.272.683 2.015zM17.5 12a2 2 0 1 1-4 0a2 2 0 0 1 4 0m1.5 4.5c0 1.245-1 2.5-3.5 2.5S12 17.75 12 16.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5" stroke-width="0.5" stroke="currentColor" /></svg>
+			</CardAgent>
+		</div>
+	</section>
+	<section>
+		@if (_monitorvm.RunningAgent.Any() || _stvm.AllTasks.Any())
+		{
+			<h3>@_locals["_agentActive"]</h3>
+			<div class="agent-list-wrapper">
+				@foreach (var agent in _monitorvm.RunningAgent)
+				{
+					<RunningAgentCard OnEdit="_ => ToggleMonitoringModalAgent(agent.RoomId)" OnDel="_ => DeleteAllMonitors(agent.RoomId)">
+						<Icon>
+							<img src="_content/EvaComponentLibrary/img/fluent--globe-person-20-regular.svg" alt="Alternate Text" />
+						</Icon>
+						<Type>
+							@_locals["_agentWeb"]
+						</Type>
+						<Lastcheck>
+							@agent.TimeInPast
+						</Lastcheck>
+
+					</RunningAgentCard>
+				}
+				@foreach (var task in _stvm.AllTasks)
+				{
+					<RunningAgentCard OnEdit=" _=> ToggleGeneralModalAgent(task.RoomId)" OnDel="_ => DeleteTask(task.RoomId)">
+						<Icon>
+							<img src="_content/EvaComponentLibrary/img/fluent--communication-person-20-regular.svg" alt="Alternate Text" />
+						</Icon>
+						<Type>
+							@_locals["_agentGen"]
+						</Type>
+
+					</RunningAgentCard>
+				}
+			</div>
+		}
+	</section>
+</div>
+
+
+
+@code {
+	[Parameter]
+	public string? Sub { get; set; }
+	private string _customAgent = "/agent/custom-agent";
+	private string _webAgent = "/agent/web-agent";
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		_lg.UpdateLanguage += _monitorvm.adjustTheLanguage; ;
+		_monitorvm.UpdateUI += update;
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private async Task ToggleMonitoringModalAgent(string roomId)
+	{
+		await _monitorvm.GetMonitorsByRoomId(roomId);
+		_lg.TriggerMonitoringModalAgent?.Invoke(true);
+	}
+	private async Task ToggleGeneralModalAgent(string roomId)
+	{
+		var result = await _stvm.GetTaskToEdit(roomId);
+		_lg.TriggerGeneralModalAgent?.Invoke(true);
+
+		if (!result)
+		{
+			_sn.PoPSnackBar("_genError", Severity.Error);
+			return;
+		}
+	
+	}
+
+	private void NavigateTo(string path)
+	{
+		NavigationManager.NavigateTo(path);
+	}
+
+	private async Task DeleteAllMonitors(string RoomId)
+	{
+		var result = await _monitorvm.DeleteAllMonitor(RoomId);
+
+		if (!result.Equals("OK", StringComparison.OrdinalIgnoreCase))
+		{
+			_sn.SnackBarManager(result);
+		}
+		update();
+	}
+
+	private async Task DeleteTask(string roomId)
+	{
+		var result = await _stvm.DeleteScheduledTaskByRoomIdAsync(roomId);
+
+		if (!result)
+		{
+			_sn.SnackBarManager("_genError");
+		}
+		update();
+	}
+}

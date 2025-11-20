@@ -1,0 +1,134 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.ScheduledTaskViewModel _stvm;
+@inject EvaComponentLibrary.ViewModels.MonitoringViewModel _monitorvm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject MySnackBar _sn;
+
+<div class=" main wrapper-container">
+	<div class="main content">
+		<div class="felx-container">
+			<MudTextField Class="searchbar"
+						  @bind-Value="_search"
+						  Label="@_locals["_search"]"
+						  Immediate="true"
+						  Variant="Variant.Outlined"
+						  Adornment="Adornment.End"
+						  AdornmentIcon="@Icons.Material.Filled.Search"
+						  AdornmentColor="Color.Secondary"
+						  autocomplete="off" />
+			@if (IsLoading && !_vm.SitesSaved.Any())
+			{
+				<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+			}
+			<div class="scroll-list">
+				@if (!_vm.TrashItems.Any())
+				{
+					<div class="empty">
+						<img src="_content/EvaComponentLibrary/img/box.png" />
+						<p>@_locals["_empty"]</p>
+					</div>
+				}
+				<div class="scroll-content">
+					<MudList T="string">
+						<Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize Context="room" Items="_vm.TrashItems.ToList()">
+							@if (room.Title.ToLower().Contains(_search.ToLower()) || string.IsNullOrWhiteSpace(_search))
+							{
+								<MudListItem>
+									<ChildContent>
+										<p>@room.Title</p>
+										<MudIconButton Class="del-btn"
+													   Icon="@Icons.Material.Filled.RestoreFromTrash"
+													   OnClick="_ => RestoreRoom(room)">
+										</MudIconButton>
+										<MudIconButton Class="del-btn"
+													   Icon="@Icons.Material.Filled.Delete"
+													   OnClick="async() => await HandleDelete(room)">
+										</MudIconButton>
+
+									</ChildContent>
+								</MudListItem>
+							}
+						</Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize>
+
+					</MudList>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+@code {
+	[Parameter]
+	public bool IsLoading { get; set; }
+	private string _search = string.Empty;
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		_lg.UpdateTrashAndArchive += update;
+
+	}
+	private async Task RestoreRoom(Room room)
+	{
+		var result = await _vm.SetRoomArchived(room.RoomId, false);
+		if (string.IsNullOrEmpty(result))
+		{
+			_sn.PoPSnackBar("_genError", Severity.Error);
+			return;
+		}
+		room.Archived = false;
+		await _vm.GetAllRooms();
+		_lg.UpdateSidebarforTask?.Invoke();
+	}
+	private async Task DeleteRoom(Room room)
+	{
+		bool result;
+		if (room.Pinned)
+		{
+			result = await _stvm.DeleteScheduledTaskByRoomIdAsync(room.RoomId);
+		}
+		result = await _vm.DeleteRoomAsync(room.RoomId);
+		if (!result)
+		{
+			_sn.PoPSnackBar("_genError", Severity.Error);
+		}
+		update();
+	}
+	private async Task DelMonitorAndRoom(Room room)
+	{
+		var result = await _monitorvm.DeleteMonitorAndRoom(room.RoomId);
+		if (!result.Equals("OK"))
+		{
+			_sn.SnackBarManager(result);
+		}
+			
+	}
+	private async Task HandleDelete(Room room)
+	{
+		switch (room.RoomTypes)
+		{
+			case RoomTypes.MONITORING:
+				await DelMonitorAndRoom(room);
+				break;
+			default:
+				await DeleteRoom(room);
+				break;
+		}
+		update();
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+}

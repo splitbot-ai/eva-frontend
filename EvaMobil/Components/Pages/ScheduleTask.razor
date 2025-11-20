@@ -1,0 +1,13 @@
+﻿@page "/task"
+@page "/task/{sub}"
+@using EvaComponentLibrary.Views.PagesComponents.AgentsComponent;
+
+
+<GeneralAgent Sub="@Sub"></GeneralAgent>
+
+@code {
+
+	[Parameter]
+
+	public string Sub { get; set; } = string.Empty;
+}

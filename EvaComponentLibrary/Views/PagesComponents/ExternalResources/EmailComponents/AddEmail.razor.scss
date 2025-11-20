@@ -1,0 +1,59 @@
+﻿@import"../../../styles/light-dark.scss";
+.main {
+    .email-add-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 77px;
+        padding: 20px;
+        justify-content: flex-start;
+
+        .email-options {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 300px;
+            max-height: 90px;
+            background-color: var(--secondary-color);
+            border-radius: 20px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer;
+
+
+
+            .email-icon {
+                width: 90px;
+                padding: 20px;
+                filter: var(--invert100-img);
+            }
+
+            h3 {
+                color: var(--text-color);
+                font-family: "roboto-light";
+            }
+
+            .coming-soon {
+                position: absolute;
+                bottom: 36px;
+                right: 0;
+
+                .email-icon {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .disable {
+            background-color: var(--sidebar-color);
+            pointer-events:none;
+            h3, .email-icon {
+                opacity: 0.5;
+            }
+        }
+    }
+}

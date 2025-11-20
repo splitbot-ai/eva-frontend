@@ -1,0 +1,177 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.ViewModels.Cloud;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject NextCloudViewModel _nvm;
+
+@inject ISnackbar Snackbar;
+
+<div class="modal @(Open ? "open" : string.Empty) main">
+    <div @onclick="ToggleOpen" class="backdrop-container"></div>
+    <div class="modal-body">
+        <div class="modal-head">
+            <MudButton OnClick="ToggleOpen">
+                <MudIcon Icon="@Icons.Material.Filled.Info"></MudIcon>
+                <h3>@_locals["_info"]</h3>
+            </MudButton>
+
+        </div>
+        <div class="modal-content">
+            <div class="body">
+                <div class="message">
+
+                    <p>@Message</p>
+
+                    @if (List.Any())
+                    {
+                        <div class="list" >
+                            <ul>
+                                @foreach(var item in List)
+                                { 
+                                    <p>*@item</p>
+                                }
+                            </ul>
+                        </div>
+
+                    }
+                </div>
+                <div class="footer">
+                    <MudButton OnClick="cancle" Variant="Variant.Filled">@_locals["_no"]</MudButton>
+                    <MudButton OnClick="SaveUrl" @onkeydown="Enter" Variant="Variant.Filled" Color="Color.Primary">@_locals["_yes"]</MudButton>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <EvaComponentLibrary.Views.Components.ToolTip Open="_openInfo" Info="@_infoMessage" OnClose="InfoModalHandler"></EvaComponentLibrary.Views.Components.ToolTip> *@
+
+@code {
+
+    [Parameter]
+    public bool Open { get; set; }
+
+
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback Action { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    [Parameter]
+    public List<string>? List{ get; set; }
+
+
+    public string? theme { get; set; }
+
+
+
+
+
+
+
+    // private bool _openInfo;
+
+    // private string _infoMessage;
+
+    private bool _isSending = false;
+    bool isShow;
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        theme = _vm.themeMode;
+        _vm.UpdateInterface += StateHasChanged;
+
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!_vm.HasSession())
+            return;
+        await base.OnInitializedAsync();
+    }
+
+
+
+
+
+    private void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code.Equals("Enter") || e.Code.Equals("NumpadEnter"))
+        {
+            SaveUrl();
+        }
+    }
+
+    private void ToggleOpen()
+    {
+        Open = !Open;
+        OnClose.InvokeAsync(Open);
+        // _Chat._openSettings = Open;
+    }
+
+    private void SaveUrl()
+    {
+        Action.InvokeAsync();
+        ToggleOpen();
+    }
+
+    private void cancle()
+    {
+        ToggleOpen();
+    }
+
+
+  
+
+
+
+    public void Update()
+    {
+        StateHasChanged();
+    }
+
+    // private void InfoNextCloud()
+    // {
+    //     _infoMessage = _locals["_nextCloudInfo"];
+    //     ToggleInfo();
+    // }
+
+    CultureInfo[] cultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("de-DE")
+    };
+
+    CultureInfo Culture
+    {
+
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                Thread.CurrentThread.CurrentCulture = value;
+                Thread.CurrentThread.CurrentUICulture = value;
+
+                CultureInfo.DefaultThreadCurrentCulture = value;
+                CultureInfo.DefaultThreadCurrentUICulture = value;
+                StateHasChanged();
+            }
+        }
+    }
+}

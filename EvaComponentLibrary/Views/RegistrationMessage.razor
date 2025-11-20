@@ -1,0 +1,31 @@
+﻿@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using EvaComponentLibrary.Languages;
+@inject NavigationManager NavigationManager;
+@inject IStringLocalizer<MyStrings> _locals;
+
+
+<main class="main">
+	<section class="content-container">
+
+	
+		<div class="img-container">
+			<img src="_content/EvaComponentLibrary/img/brand/brand-logo.svg" alt="Alternate Text" />
+		</div>
+		<div class="text-container">
+			<p>@_locals["_thanksForRegistration"]</p>
+			<p>@_locals["_registrationMessage"]</p>
+		</div>
+		<MudButton OnClick="goToLoginPage" Variant="Variant.Outlined" Color="Color.Secondary">
+			@_locals["_backToLogin"]
+			</MudButton>
+	</section>
+
+</main>
+
+
+@code{
+	void goToLoginPage(){
+		NavigationManager.NavigateTo("/login");
+	}
+}

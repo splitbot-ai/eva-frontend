@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:EvaMobil"
+             x:Class="EvaMobil.MainPage"
+             x:Name="ContentPageMain"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             ios:Page.UseSafeArea="True"
+             BackgroundColor="#222222"
+             
+             >
+    <Grid Padding="{OnPlatform iOS='0,0,0,0', Android='0,0,0,0'}">
+        
+        <!--<StackLayout x:Name="iOSContainer">-->
+            <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" ios:Page.UseSafeArea="true">
+                <BlazorWebView.RootComponents>
+                    <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
+                </BlazorWebView.RootComponents>
+            </BlazorWebView>
+        <!--</StackLayout>-->
+        <!--<Button Text="Click Me"  Clicked="Clicked"></Button>-->
+        <BoxView x:Name="navBar"
+            HeightRequest="35"
+            VerticalOptions="End"
+            HorizontalOptions="FillAndExpand"
+            Margin="0,0,0,-34"/>
+    </Grid>
+    
+</ContentPage>

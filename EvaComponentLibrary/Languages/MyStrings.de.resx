@@ -1,0 +1,780 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="_isSending" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="_account" xml:space="preserve">
+    <value>Konto</value>
+  </data>
+  <data name="_add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="_addNewInst" xml:space="preserve">
+    <value>Neue Anweisung hinzufügen</value>
+  </data>
+  <data name="_addNewRes" xml:space="preserve">
+    <value>Neue Antwort hinzufügen</value>
+  </data>
+  <data name="_apply" xml:space="preserve">
+    <value>Übernehmen</value>
+  </data>
+  <data name="_back" xml:space="preserve">
+    <value>Zurück</value>
+  </data>
+  <data name="_backToLogin" xml:space="preserve">
+    <value>Zurück zur Anmeldeseite</value>
+  </data>
+  <data name="_cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="_colmode" xml:space="preserve">
+    <value>Farbmodus</value>
+  </data>
+  <data name="_customInst" xml:space="preserve">
+    <value>Standardanweisungen</value>
+  </data>
+  <data name="_deletedSucc" xml:space="preserve">
+    <value>{0} erfolgreich gelöscht.</value>
+  </data>
+  <data name="_docMangag" xml:space="preserve">
+    <value>Dateispeicher</value>
+  </data>
+  <data name="_edit" xml:space="preserve">
+    <value>Bearbeiten</value>
+  </data>
+  <data name="_email" xml:space="preserve">
+    <value>E-Mail</value>
+  </data>
+  <data name="_familyname" xml:space="preserve">
+    <value>Nachname</value>
+  </data>
+  <data name="_forgotPass" xml:space="preserve">
+    <value>Passwort vergessen?</value>
+  </data>
+  <data name="_genError" xml:space="preserve">
+    <value>Etwas ist schiefgelaufen. Versuche es später nocheinmal.</value>
+  </data>
+  <data name="_history" xml:space="preserve">
+    <value>Verlauf</value>
+  </data>
+  <data name="_imprint" xml:space="preserve">
+    <value>Impressum</value>
+  </data>
+  <data name="_lang" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="_login" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="_msgPlaceholder" xml:space="preserve">
+    <value>Nachricht an {0}...</value>
+  </data>
+  <data name="_name" xml:space="preserve">
+    <value>Vorname</value>
+  </data>
+  <data name="_newPass" xml:space="preserve">
+    <value>Neues Passwort</value>
+  </data>
+  <data name="_on-Premise" xml:space="preserve">
+    <value>On-Premise Einstellungen</value>
+  </data>
+  <data name="_pass" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="_privacy" xml:space="preserve">
+    <value>Datenschutzerklärung</value>
+  </data>
+  <data name="_reachLimit" xml:space="preserve">
+    <value>Du wirst deinen Speicherplatz überschreiten. Upgrade dein Paket oder lösche Dateien, um mehr hochzuladen. </value>
+  </data>
+  <data name="_registrationMessage" xml:space="preserve">
+    <value>Wir haben Ihnen eine E-Mail gesendet, um Ihre E-Mail-Adresse zu verifizieren und Ihr Konto zu aktivieren.</value>
+  </data>
+  <data name="_repeatPass" xml:space="preserve">
+    <value>Passwort wiederholen</value>
+  </data>
+  <data name="_resBehaviour" xml:space="preserve">
+    <value>Antwortverhalten</value>
+  </data>
+  <data name="_save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="_search" xml:space="preserve">
+    <value>Suche</value>
+  </data>
+  <data name="_settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="_signup" xml:space="preserve">
+    <value>Registrieren</value>
+  </data>
+  <data name="_sub" xml:space="preserve">
+    <value>Abonnement</value>
+  </data>
+  <data name="_subDomain" xml:space="preserve">
+    <value>Unterseiten untersuchen</value>
+  </data>
+  <data name="_succUpload" xml:space="preserve">
+    <value>{0} erfolgreich hinzugefügt</value>
+  </data>
+  <data name="_support" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="_thanksForRegistration" xml:space="preserve">
+    <value>Vielen Dank für Ihre Registrierung.</value>
+  </data>
+  <data name="_tooManyFiles" xml:space="preserve">
+    <value>Max. 10 Dokumente</value>
+  </data>
+  <data name="_username" xml:space="preserve">
+    <value>E-Mail/Username</value>
+  </data>
+  <data name="_webSafe" xml:space="preserve">
+    <value>Webseiten SPEICHERN</value>
+  </data>
+  <data name="_website" xml:space="preserve">
+    <value>Webseiten</value>
+  </data>
+  <data name="_docSafe" xml:space="preserve">
+    <value>Dokumente hochladen</value>
+  </data>
+  <data name="_addDocs" xml:space="preserve">
+    <value>Dateien hinzufügen</value>
+  </data>
+  <data name="_websearch" xml:space="preserve">
+    <value>Websuche - Antwortzeit erhöht sich</value>
+  </data>
+  <data name="_insts" xml:space="preserve">
+    <value>Anweisungen</value>
+  </data>
+  <data name="_about" xml:space="preserve">
+    <value>ÜBER</value>
+  </data>
+  <data name="_delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="_uploadFiles" xml:space="preserve">
+    <value>Dateien hochladen</value>
+  </data>
+  <data name="_newChat" xml:space="preserve">
+    <value>Neuer Chat</value>
+  </data>
+  <data name="_datadel" xml:space="preserve">
+    <value>Account Löschen</value>
+  </data>
+  <data name="_authServer" xml:space="preserve">
+    <value>Auth Server</value>
+  </data>
+  <data name="_host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="_realm" xml:space="preserve">
+    <value>Realm</value>
+  </data>
+  <data name="_succDelete" xml:space="preserve">
+    <value>erfolgreich gelöscht</value>
+  </data>
+  <data name="_succEdite" xml:space="preserve">
+    <value>erfolgreich bearbeitet</value>
+  </data>
+  <data name="_succSelect" xml:space="preserve">
+    <value>erfolgreich ausgewählt</value>
+  </data>
+  <data name="_errorOnPremise" xml:space="preserve">
+    <value>Beim Speichern ist Fehler aufgetreten</value>
+  </data>
+  <data name="_saveOnPremise" xml:space="preserve">
+    <value>Die Konfiguration wurde erfolgreich gespeichert</value>
+  </data>
+  <data name="_nextCloud" xml:space="preserve">
+    <value>NextCloud</value>
+  </data>
+  <data name="_nextCloudList" xml:space="preserve">
+    <value>Dateienliste</value>
+  </data>
+  <data name="_StandardanweisungenInfo" xml:space="preserve">
+    <value>Definiert die grundlegende Identität und Rolle von {0}. Anpassungen beeinflussen das Antwortverhalten aller Konversationen.</value>
+  </data>
+  <data name="_headline" xml:space="preserve">
+    <value>Überschrift</value>
+  </data>
+  <data name="_description" xml:space="preserve">
+    <value>Beschreibung</value>
+  </data>
+  <data name="_infoVisibilityOptions" xml:space="preserve">
+    <value>Optionen zur Sichtbarkeit von Info</value>
+  </data>
+  <data name="_off" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="_on" xml:space="preserve">
+    <value>An</value>
+  </data>
+  <data name="_antwortverhaltenInfo" xml:space="preserve">
+    <value>Steuern Sie die Art und Weise, wie der Chatbot antwortet. Geben Sie spezifische Anweisungen wie 'Formuliere die Antwort in deutscher Sprache' oder 'Antworte im Stil eines Historikers'. Passen Sie Ton, Sprache und Perspektive der Antworten an Ihre Bedürfnisse an.</value>
+  </data>
+  <data name="_dateienInfo" xml:space="preserve">
+    <value>Dokumente hochladen, um präzisere Antworten zu erhalten. Nicht mehr benötigte Dateien können gelöscht werden.</value>
+  </data>
+  <data name="_websitesInfo" xml:space="preserve">
+    <value>Gespeicherte Websites dienen als zusätzliche Informationsquelle für präzisere Antworten. Sie können jederzeit entfernt werden, um die Relevanz der Chatbot-Antworten zu steuern.</value>
+  </data>
+  <data name="_nextCloudInfo" xml:space="preserve">
+    <value>Eingabe eines Ordner-Links für Zugriff auf Nextcloud-Daten. Erweitert Informationsquellen des Chatbots.</value>
+  </data>
+  <data name="_authInfo" xml:space="preserve">
+    <value>Geben Sie die URL des Authentifizierungsservers an</value>
+  </data>
+  <data name="_hostInfo" xml:space="preserve">
+    <value>Geben Sie die URL des Gateways an</value>
+  </data>
+  <data name="_realmInfo" xml:space="preserve">
+    <value>Tragen Sie den eindeutigen Namen des Realms oder der Domäne ein</value>
+  </data>
+  <data name="_sourceSelection" xml:space="preserve">
+    <value>Einschränkung der Quellen, auf die sich {0} bezieht. Sind keine Quelldokumente ausgewählt, werden standardmäßig alle Dokumente genutzt.</value>
+  </data>
+  <data name="_hello" xml:space="preserve">
+    <value>Hallo</value>
+  </data>
+  <data name="_more" xml:space="preserve">
+    <value>Mehr</value>
+  </data>
+  <data name="_sourcesList" xml:space="preserve">
+    <value>Quellen</value>
+  </data>
+  <data name="_saveMessage" xml:space="preserve">
+    <value>Möchtest du die folgende(n) Website(s) speichern?</value>
+  </data>
+  <data name="_files" xml:space="preserve">
+    <value>Dateien</value>
+  </data>
+  <data name="_currentName" xml:space="preserve">
+    <value>Aktueller Name</value>
+  </data>
+  <data name="_newName" xml:space="preserve">
+    <value>Neuer Name</value>
+  </data>
+  <data name="_renameSucc" xml:space="preserve">
+    <value>Der Raumtitel wurde erfolgreich geändert zu {0}</value>
+  </data>
+  <data name="_renameWarn" xml:space="preserve">
+    <value>Please enter the new title.</value>
+  </data>
+  <data name="_empty" xml:space="preserve">
+    <value>Leer</value>
+  </data>
+  <data name="_contLost" xml:space="preserve">
+    <value>Verbindung verloren.</value>
+  </data>
+  <data name="_contSucc" xml:space="preserve">
+    <value>Verbunden.</value>
+  </data>
+  <data name="_error" xml:space="preserve">
+    <value>Etwas ist schiefgelaufen. Versuche es erneut.</value>
+  </data>
+  <data name="_recon" xml:space="preserve">
+    <value>Verbindung wird wiederhergestellt....</value>
+  </data>
+  <data name="_webAct" xml:space="preserve">
+    <value>Websuche ist aktiviert.</value>
+  </data>
+  <data name="_webDeAct" xml:space="preserve">
+    <value>Websuche ist deaktiviert.</value>
+  </data>
+  <data name="_rename" xml:space="preserve">
+    <value>Umbenennen</value>
+  </data>
+  <data name="_pdf" xml:space="preserve">
+    <value>Das PDF konnte nicht gefunden werden.</value>
+  </data>
+  <data name="_copy" xml:space="preserve">
+    <value>In die Zwischenablage kopiert.</value>
+  </data>
+  <data name="_answerToLong" xml:space="preserve">
+    <value>Antwort zu lang</value>
+  </data>
+  <data name="_answerTooShort" xml:space="preserve">
+    <value>Antwort zu kurz</value>
+  </data>
+  <data name="_wrongAnswer" xml:space="preserve">
+    <value>Falsche Antwort</value>
+  </data>
+  <data name="_wrongAnswerToQuestion" xml:space="preserve">
+    <value>Antwort zu ungenau</value>
+  </data>
+  <data name="_wrongSource" xml:space="preserve">
+    <value>Falsche Quellen</value>
+  </data>
+  <data name="_feedback" xml:space="preserve">
+    <value>Danke für Dein Feedback!</value>
+  </data>
+  <data name="_specAnswer" xml:space="preserve">
+    <value>Antwort spezifizieren...*</value>
+  </data>
+  <data name="_handleOvertime" xml:space="preserve">
+    <value>Wie gehe ich mit Überstunden um?</value>
+  </data>
+  <data name="_writeEffectiveReport" xml:space="preserve">
+    <value>Wie schreibe ich einen effektiven Bericht?</value>
+  </data>
+  <data name="_callInSick" xml:space="preserve">
+    <value>Wie melde ich mich krank?</value>
+  </data>
+  <data name="_increaseProductivity" xml:space="preserve">
+    <value>Wie kann ich meine Produktivität steigern?</value>
+  </data>
+  <data name="_manageFinances" xml:space="preserve">
+    <value>Wie kann ich meine Finanzen besser verwalten?</value>
+  </data>
+  <data name="_requestVacation" xml:space="preserve">
+    <value>Wie beantrage ich Urlaub?</value>
+  </data>
+  <data name="_saveMoney" xml:space="preserve">
+    <value>Wie kann ich Geld sparen?</value>
+  </data>
+  <data name="_writeExcuseNote" xml:space="preserve">
+    <value>Wie schreibe ich eine Entschuldigung für die Schule/Arbeit?</value>
+  </data>
+  <data name="_fileDownload" xml:space="preserve">
+    <value>Die Datei wurde erfolgreich heruntergeladen.</value>
+  </data>
+  <data name="_no" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="_yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="_emailExists" xml:space="preserve">
+    <value>E-Mail existiert bereits.</value>
+  </data>
+  <data name="_fillAll" xml:space="preserve">
+    <value>Bitte füllen Sie die Felder mit * aus.</value>
+  </data>
+  <data name="_webSearchbtn" xml:space="preserve">
+    <value>Websuche</value>
+  </data>
+  <data name="_addEMail" xml:space="preserve">
+    <value>E-Mail-Konto hinzufügen</value>
+  </data>
+  <data name="_addGmail" xml:space="preserve">
+    <value>Gmail-Konto hinzufügen</value>
+  </data>
+  <data name="_addEmailAccount" xml:space="preserve">
+    <value>Ein neues E-Mail-Konto wurde hinzugefügt.</value>
+  </data>
+  <data name="_incorrectCredentials" xml:space="preserve">
+    <value>Die eingegebenen Daten sind falsch.</value>
+  </data>
+  <data name="_manage" xml:space="preserve">
+    <value>Verwalten</value>
+  </data>
+  <data name="_succChange" xml:space="preserve">
+    <value>Änderungen wurden erfolgreich gespeichert.</value>
+  </data>
+  <data name="_syncEmail" xml:space="preserve">
+    <value>E-Mail-Synchronisierung ist aktiviert.</value>
+  </data>
+  <data name="_unsyncEmail" xml:space="preserve">
+    <value>E-Mail-Synchronisierung ist deaktiviert.</value>
+  </data>
+  <data name="_connect" xml:space="preserve">
+    <value>Verbinden</value>
+  </data>
+  <data name="_externalAssets" xml:space="preserve">
+    <value>Personalisierung</value>
+  </data>
+  <data name="_maxFiles" xml:space="preserve">
+    <value>Sie können maximal 10 Dateien gleichzeitig hochladen.</value>
+  </data>
+  <data name="_emailInfo" xml:space="preserve">
+    <value>Mit der Verknüpfung eines E-Mailpostfachs kann der Inhalt von E-Mails als zusätzliche Informationsquelle genutzt werden.</value>
+  </data>
+  <data name="_task" xml:space="preserve">
+    <value>Aufgabe planen</value>
+  </data>
+  <data name="_createTask" xml:space="preserve">
+    <value>Aufgabe erstellen</value>
+  </data>
+  <data name="_daily" xml:space="preserve">
+    <value>täglich</value>
+  </data>
+  <data name="_monthly" xml:space="preserve">
+    <value>monatlich</value>
+  </data>
+  <data name="_weekly" xml:space="preserve">
+    <value>wöchentlich</value>
+  </data>
+  <data name="_yearly" xml:space="preserve">
+    <value>jährlich</value>
+  </data>
+  <data name="_scheduledTaskInfo" xml:space="preserve">
+    <value>Erstellung regelmäßig wiederkehrender Aufgaben, die automatisiert ausgeführt werden sollen.</value>
+  </data>
+  <data name="_desTask" xml:space="preserve">
+    <value>Beschreiben Sie die Aufgabe für {0}.</value>
+  </data>
+  <data name="_howOft" xml:space="preserve">
+    <value>Wie oft?</value>
+  </data>
+  <data name="_title" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="_when" xml:space="preserve">
+    <value>Wann?</value>
+  </data>
+  <data name="_editTask" xml:space="preserve">
+    <value>Aufgabe bearbeiten</value>
+  </data>
+  <data name="_hourly" xml:space="preserve">
+    <value>stündlich</value>
+  </data>
+  <data name="_taskEdit" xml:space="preserve">
+    <value>Die Aufgabe wurde bearbeitet</value>
+  </data>
+  <data name="_taskSucc" xml:space="preserve">
+    <value>Eine neue Aufgabe wurde erstellt</value>
+  </data>
+  <data name="_crawlRetention" xml:space="preserve">
+    <value>E-Mails aus den letzten {0} Tagen</value>
+  </data>
+  <data name="_active" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="_deactivated" xml:space="preserve">
+    <value>Deaktiviert</value>
+  </data>
+  <data name="_emailAcc" xml:space="preserve">
+    <value>E-Mail-Konto ist {0}</value>
+  </data>
+  <data name="_emailAtt" xml:space="preserve">
+    <value>Sollte der E-Mail-Anhang enthalten sein? {0}</value>
+  </data>
+  <data name="_attachmentAct" xml:space="preserve">
+    <value>E-Mail-Anhänge werden jetzt einbezogen.</value>
+  </data>
+  <data name="_attachmentDea" xml:space="preserve">
+    <value>E-Mail-Anhänge werden nicht mehr einbezogen.</value>
+  </data>
+  <data name="_attach" xml:space="preserve">
+    <value>Anhang</value>
+  </data>
+  <data name="_missTask" xml:space="preserve">
+    <value>Eine entsprechende Aufgabe zur Bearbeitung existiert nicht.</value>
+  </data>
+  <data name="_path" xml:space="preserve">
+    <value>Pfad:</value>
+  </data>
+  <data name="_import" xml:space="preserve">
+    <value>Dateien importieren</value>
+  </data>
+  <data name="_addNextCloudAccount" xml:space="preserve">
+    <value>Ein neues Nextcloud-Konto wurde hinzugefügt.</value>
+  </data>
+  <data name="_addOutLook" xml:space="preserve">
+    <value>Ein neues Outlook-Konto wurde hinzugefügt.</value>
+  </data>
+  <data name="_eventTirgger" xml:space="preserve">
+    <value>Bei neuer E-Mail auslösen</value>
+  </data>
+  <data name="_file" xml:space="preserve">
+    <value>Datei</value>
+  </data>
+  <data name="_lastSync" xml:space="preserve">
+    <value>Aktualisiert</value>
+  </data>
+  <data name="_status" xml:space="preserve">
+    <value>Zustand</value>
+  </data>
+  <data name="_sync" xml:space="preserve">
+    <value>synchronisieren</value>
+  </data>
+  <data name="_unauthorized" xml:space="preserve">
+    <value>Sie haben nicht die erforderliche Berechtigung.</value>
+  </data>
+  <data name="_succFileUpload" xml:space="preserve">
+    <value>{0} Dateien wurden erfolgreich hochgeladen</value>
+  </data>
+  <data name="_thu" xml:space="preserve">
+    <value>Donnerstag</value>
+  </data>
+  <data name="_apr" xml:space="preserve">
+    <value>April</value>
+  </data>
+  <data name="_aug" xml:space="preserve">
+    <value>August</value>
+  </data>
+  <data name="_dec" xml:space="preserve">
+    <value>Dezember</value>
+  </data>
+  <data name="_feb" xml:space="preserve">
+    <value>Februar</value>
+  </data>
+  <data name="_fri" xml:space="preserve">
+    <value>Freitag</value>
+  </data>
+  <data name="_jan" xml:space="preserve">
+    <value>Januar</value>
+  </data>
+  <data name="_jul" xml:space="preserve">
+    <value>Juli</value>
+  </data>
+  <data name="_jun" xml:space="preserve">
+    <value>Juni</value>
+  </data>
+  <data name="_mar" xml:space="preserve">
+    <value>März</value>
+  </data>
+  <data name="_may" xml:space="preserve">
+    <value>Mai</value>
+  </data>
+  <data name="_mon" xml:space="preserve">
+    <value>Montag</value>
+  </data>
+  <data name="_nov" xml:space="preserve">
+    <value>November</value>
+  </data>
+  <data name="_oct" xml:space="preserve">
+    <value>Oktober</value>
+  </data>
+  <data name="_sat" xml:space="preserve">
+    <value>Samstag</value>
+  </data>
+  <data name="_sep" xml:space="preserve">
+    <value>September</value>
+  </data>
+  <data name="_sun" xml:space="preserve">
+    <value>Sonntag</value>
+  </data>
+  <data name="_tue" xml:space="preserve">
+    <value>Dienstag</value>
+  </data>
+  <data name="_wed" xml:space="preserve">
+    <value>Mittwoch</value>
+  </data>
+  <data name="_fileSync" xml:space="preserve">
+    <value>Dateisynchronisierung wurde gestartet.</value>
+  </data>
+  <data name="_month" xml:space="preserve">
+    <value>Monat</value>
+  </data>
+  <data name="_select" xml:space="preserve">
+    <value>Bitte auswählen</value>
+  </data>
+  <data name="_weekDay" xml:space="preserve">
+    <value>Wochentag</value>
+  </data>
+  <data name="_favourite" xml:space="preserve">
+    <value>Favorit</value>
+  </data>
+  <data name="_addToBin" xml:space="preserve">
+    <value>Papierkorb</value>
+  </data>
+  <data name="_addNextcloud" xml:space="preserve">
+    <value>Ein neues Nextcloud-Konto wurde hinzugefügt.</value>
+  </data>
+  <data name="_unfavourite" xml:space="preserve">
+    <value>Entfavorisieren</value>
+  </data>
+  <data name="_memory" xml:space="preserve">
+    <value>Gedächtnis</value>
+  </data>
+  <data name="_addMemory" xml:space="preserve">
+    <value>Gedächtnis Hinzufügen</value>
+  </data>
+  <data name="_removeMemory" xml:space="preserve">
+    <value>Raum vergessen</value>
+  </data>
+  <data name="_agent" xml:space="preserve">
+    <value>Agenten</value>
+  </data>
+  <data name="_agentEmail" xml:space="preserve">
+    <value>Email Agent</value>
+  </data>
+  <data name="_agentFile" xml:space="preserve">
+    <value>Datei-Agent</value>
+  </data>
+  <data name="_agentGen" xml:space="preserve">
+    <value>Allgemeiner Agent</value>
+  </data>
+  <data name="_agentMonitor" xml:space="preserve">
+    <value>Überwachungs-Agent</value>
+  </data>
+  <data name="_agentSum" xml:space="preserve">
+    <value>Zusammenfassungs-Agent</value>
+  </data>
+  <data name="_agentWeb" xml:space="preserve">
+    <value>Web Agent</value>
+  </data>
+  <data name="_addWebsite" xml:space="preserve">
+    <value>Website Link hinzufügen</value>
+  </data>
+  <data name="_addUrl" xml:space="preserve">
+    <value>URL Hinzufügen</value>
+  </data>
+  <data name="_createMonitoring" xml:space="preserve">
+    <value>Agent erstellen</value>
+  </data>
+  <data name="_addSucc" xml:space="preserve">
+    <value>erfolgreich hinzugefügt</value>
+  </data>
+  <data name="_existedLink" xml:space="preserve">
+    <value>Dieser Link existierte.</value>
+  </data>
+  <data name="_outlook" xml:space="preserve">
+    <value>Durch Hinzufügen eines Outlook-Kontos wird Eva mit Ihrem Outlook-E-Mail-Konto und Ihrem Kalender verbunden.</value>
+  </data>
+  <data name="_oneDriveInfo" xml:space="preserve">
+    <value>Eingabe eines Ordner-Links für Zugriff auf OneDrive-Daten. Erweitert Informationsquellen des Chatbots.</value>
+  </data>
+  <data name="_added" xml:space="preserve">
+    <value>Hinzugefügt</value>
+  </data>
+  <data name="_deleted" xml:space="preserve">
+    <value>Gelöscht</value>
+  </data>
+  <data name="_timDAgo" xml:space="preserve">
+    <value>vor {0} Tag(en)</value>
+  </data>
+  <data name="_timStart" xml:space="preserve">
+    <value>läuft...</value>
+  </data>
+  <data name="_timHAgo" xml:space="preserve">
+    <value>vor {0} Stunde(n)</value>
+  </data>
+  <data name="_timMAgo" xml:space="preserve">
+    <value>vor {0} Minute(n)</value>
+  </data>
+  <data name="_timMoAgo" xml:space="preserve">
+    <value>vor {0} Monat(en)</value>
+  </data>
+  <data name="_timSAgo" xml:space="preserve">
+    <value>vor {0} Sekunde(n)</value>
+  </data>
+  <data name="_timWAgo" xml:space="preserve">
+    <value>vor {0} Woche(n)</value>
+  </data>
+  <data name="_timYAgo" xml:space="preserve">
+    <value>vor {0} Jahr(en)</value>
+  </data>
+  <data name="_agentActive" xml:space="preserve">
+    <value>Aktive Agenten</value>
+  </data>
+</root>

@@ -1,0 +1,71 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOTNET_VERSION: "9.0"
+  PUBLISH_DIR: "publish"
+  DEPLOY_USER: "root"
+
+#  BUILD STAGE
+build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      variables:
+        BUILD_CONFIG: "Debug-Kosmo"
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+      variables:
+        BUILD_CONFIG: "Release-Kosmo"
+    - when: never
+  script:
+    - echo "🔧 Building branch '$CI_COMMIT_BRANCH' with configuration '$BUILD_CONFIG'"
+    - dotnet restore KosmoWASM/KosmoWASM.csproj
+    - dotnet publish KosmoWASM/KosmoWASM.csproj -c $BUILD_CONFIG -o $PUBLISH_DIR
+  artifacts:
+    paths:
+      - $PUBLISH_DIR
+    expire_in: 1 hour
+
+#  DEPLOY TO DEV (auto)
+deploy-dev:
+  stage: deploy
+  #tags:
+  #  - kosmo-frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+  before_script:
+    - echo "🧩 Setting up SSH for DEV..."
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/kosmo-frontend-deployment
+    - chmod 600 ~/.ssh/kosmo-frontend-deployment
+    - ssh-keyscan -H 10.0.251.80 >> ~/.ssh/known_hosts
+  script:
+    - echo "🚀 Deploying DEV build to 10.0.251.80..."
+    - rsync -e "ssh -i ~/.ssh/kosmo-frontend-deployment" -avz --delete $PUBLISH_DIR/ $DEPLOY_USER@10.0.251.80:/var/www/html/
+    - echo "✅ DEV deployment completed successfully!"
+  environment:
+    name: dev
+    url: http://10.0.251.80/
+
+#  DEPLOY TO PROD (manual)
+deploy-prod:
+  stage: deploy
+  tags:
+    - kosmo-frontend-prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
+  before_script:
+    - echo "🧩 Setting up SSH for PROD..."
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/kosmo-frontend-deployment
+    - chmod 600 ~/.ssh/kosmo-frontend-deployment
+    - ssh-keyscan -H 10.0.251.87 >> ~/.ssh/known_hosts
+  script:
+    - echo "🚀 Deploying PROD build to 10.0.251.87..."
+    - rsync -e "ssh -i ~/.ssh/kosmo-frontend-deployment" -avz --delete $PUBLISH_DIR/ $DEPLOY_USER@10.0.251.87:/var/www/html/
+    - echo "✅ PROD deployment completed successfully!"
+  environment:
+    name: prod
+    url: http://10.0.251.87/

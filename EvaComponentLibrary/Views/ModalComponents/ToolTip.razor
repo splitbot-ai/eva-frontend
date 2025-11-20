@@ -1,0 +1,62 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject Logistic _lg;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+
+<div class="main drawer @(_lg.OnInfoModalToggle? " open-drawer" : string.Empty) ">
+	<div class="backdrop-container  @(_lg.OnInfoModalToggle? " open-backdrop-container" : string.Empty)" @onclick=" ToggleModal"></div>
+	<div class="info-container @(_lg.OnInfoModalToggle? "open-info-container" : string.Empty)">
+
+		<div class="info-header">
+			<h3><MudIconButton Icon="@Icons.Material.Rounded.DoubleArrow" Color="Color.Primary" OnClick="ToggleModal" aria-label="github" />Info</h3>
+		</div>
+
+		<div class="message">
+			<ul>
+				<li>@_lg.InfoMessage_1</li>
+				@if (!string.IsNullOrEmpty(_lg.InfoMessage_2))
+				{
+					<li>@_lg.InfoMessage_2</li>
+				}
+			</ul>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+@code {
+
+	[Parameter]
+	public string InfoSecond { get; set; } = string.Empty;
+	private string _infoMessage = string.Empty;
+	protected override void OnInitialized(){
+		_lg.UpdateInfoModal += update;
+	}
+	public void ToggleModal()
+	{
+		
+		_lg.OnInfoModalToggle = false;
+		_lg.InfoMessage_1 = string.Empty;
+		_lg.InfoMessage_2 = string.Empty;
+		update();
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+}

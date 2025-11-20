@@ -1,0 +1,486 @@
+﻿@import "../styles/light-dark.scss";
+
+.main {
+}
+/*SIDEBAR*/
+.sidebar-container {
+    width: 300px;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: var(--sidebar-color);
+
+    .sidebar-header {
+        padding: 5px 0px 15px 0px;
+        color: #F0F;
+    }
+
+    ::deep .rounded-icon {
+        background-color: unset !important;
+        border-radius: 50%;
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+
+        path {
+            color: var(--text-color);
+        }
+    }
+
+    .new-chat-icon {
+        display: flex;
+        align-items: center;
+        /*justify-content: space-between;*/
+        cursor: pointer;
+        color: var(--text-color);
+        padding: 6px 8px;
+        gap: 6px;
+
+        p {
+            font-family: 'Kanit-Bold';
+            text-transform: uppercase;
+            font-weight: 100;
+            font-size: .9rem;
+        }
+
+        ::deep .mud-icon-root.mud-svg-icon {
+            fill: #eee;
+        }
+
+        ::deep .mud-icon-button {
+            color: var(--text-color) !important;
+        }
+    }
+
+    .menu-item-container {
+        position: relative;
+        overflow-x: hidden;
+        height: 100vh;
+
+        ::deep.options-container {
+            width: 100%;
+            text-align: left;
+            transition: .33s;
+
+            .agent {
+                border-radius: 50%;
+                padding: 5px;
+                width: 30px;
+                height: 30px;
+                color: var(--text-color);
+            }
+
+
+
+            .mud-button-label {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 6px;
+                font-size: .9rem;
+                font-weight: normal;
+
+                .rounded-icon {
+                    background-color: #9F93BB;
+                    border-radius: 50%;
+                    padding: 5px;
+                    width: 30px;
+                    height: 30px;
+                }
+
+                h3 {
+                    font-weight: 100;
+                    font-size: .9rem;
+                    font-family: Kanit-Bold;
+                    color: var(--text-color);
+                }
+            }
+        }
+
+        .options-container {
+            height: 140px;
+            transition: .33s;
+            position: sticky;
+        }
+
+        ::deep .extern-options {
+            margin-bottom: 20px;
+        }
+    }
+
+    .menu-item-container > ::deep .options-container:first-child {
+        position: sticky;
+        top: 0; /* adjust if you have a header */
+        z-index: 2;
+        background: var(--sidebar-color, #121212);
+    }
+
+    ::deep .mud-divider-fullwidth {
+        flex: 0;
+        border-color: rgb(196, 196, 196, 0.70);
+    }
+
+    ::deep .mud-input-label {
+        color: #0F0;
+        background-color: #FFFFFF00;
+    }
+}
+
+::deep .mud-input-outlined-border {
+    border-radius: 50px !important;
+    border: 2px solid var(--secondary-color) !important;
+    background-color: var(--secondary-color);
+    margin-bottom: 5px !important;
+}
+/*Sidebar*/
+
+.sidebar-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding-left: 16px;
+    border-radius: 16px;
+    align-items: flex-end;
+    .mud-button-label {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        color: var(--text-color);
+        line-height: 1.25rem;
+        font-family: roboto-medium;
+        font-weight: 100;
+        justify-content: space-around;
+
+        .icon-title {
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .title-headline {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
+            height: 1.4em;
+            font-size: .9rem;
+            white-space: nowrap;
+            font-family: 'roboto-light';
+            text-transform: none;
+        }
+
+        .typing-container {
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 1.5s steps(30, end) forwards;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 100%;
+            }
+        }
+
+        p {
+            font-size: 0.6rem;
+            font-family: 'roboto-light';
+            font-weight: 600;
+        }
+
+
+        .tracker {
+            width: fit-content;
+            height: 20px;
+            display: flex;
+            align-items: center;
+
+
+            ::deep.mud-icon-root.mud-svg-icon {
+                fill: var(--highlight-color) !important;
+            }
+
+            .unread {
+                display: block;
+                margin: 0px 5px;
+                height: 10px;
+                width: 10px;
+                background-color: var(--highlight-color);
+                border-radius: 10px;
+            }
+        }
+    }
+
+    .opt-menu {
+        width: 50px;
+        height: 50px;
+
+        &:hover {
+            .option-container {
+                display: flex;
+            }
+        }
+
+        .option-container {
+            position: absolute;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 20px;
+            flex-direction: column;
+            gap: 10px;
+            right: 0;
+            margin: 10px;
+            z-index: 1;
+            display: none;
+            transform: translateY(40px) translateX(-20px);
+            height: 130px;
+            width: 150px;
+            padding: 10px;
+
+            button {
+                padding: 3px 6px;
+            }
+
+            ::deep.mud-button-root {
+                .mud-button-label {
+                    display: flex;
+                    flex-direction: row;
+                    color: var(--text-color);
+                    justify-content: space-between;
+                    font-size: 10px;
+                    text-align: start;
+                }
+            }
+        }
+    }
+
+
+    img {
+        filter: var(--invert100-img);
+        width: 50px;
+        height: 26px;
+    }
+
+    .option-btn-sidebar {
+        .mud-icon-button-label {
+            .mud-svg-icon {
+                fill: #FFF;
+            }
+        }
+    }
+}
+.aktive {
+    background-color: var(--secondary-color);
+}
+
+::deep .mud-ripple-icon {
+    border-left: none !important;
+}
+
+::deep .mud-divider {
+    border-color: rgb(224 224 224 / 16%);
+}
+
+
+
+    ::deep .to-options {
+        width: 100%;
+        padding: 10px 0px;
+
+        .mud-button-label {
+            display: flex;
+            flex-direction: row;
+            align-content: center;
+        justify-content: flex-start;
+        }
+
+        .mud-avatar {
+            height: 30px;
+            width: 30px;
+            font-size: 15px;
+        }
+
+        h4 {
+            word-break: normal;
+            font-size: .9rem;
+            font-weight: normal;
+            font-family: Kanit-Bold;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            margin: 0px 10px;
+            height: 100%;
+            white-space: nowrap;
+            color: var(--text-color);
+        }
+
+    .mud-icon-root.mud-svg-icon {
+        fill: #FFF;
+    }
+}
+
+.sidebar-footer {
+    position: relative;
+
+    .gradient-box {
+        position: absolute;
+        width: 100%;
+        height: 25px;
+        top: -25px;
+        background: linear-gradient(#00000000, var(--sidebar-color, #00000000));
+        pointer-events: none;
+    }
+}
+
+
+.options-container {
+    height: 140px;
+    transition: .33s;
+    position: sticky;
+
+
+    ::deep button {
+        width: 100%;
+        text-align: left;
+        transition: .33s;
+        margin-bottom: 2px;
+
+        &.active-filter {
+            background-color: var(--secondary-color);
+        }
+
+        .mud-button-label {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 6px;
+            font-size: .9rem;
+            font-weight: normal;
+
+            .rounded-icon {
+                background-color: #9F93BB;
+                border-radius: 50%;
+                padding: 5px;
+                width: 30px;
+                height: 30px;
+            }
+
+            h3 {
+                font-weight: 100;
+                font-size: .9rem;
+                font-family: Kanit-Bold;
+                color: var(--text-color);
+            }
+        }
+    }
+}
+
+::deep .icon {
+    color: var(--text-color);
+}
+
+.sidebar-container {
+    ::deep .mud-input-slot {
+        color: var(--text-color);
+    }
+
+    ::deep .mud-input-label {
+        color: var(--highlight-color) !important;
+        background-color: var(--sidebar-color);
+    }
+
+    ::deep.mud-shrink ~ label.mud-input-label.mud-input-label-inputcontrol {
+        color: var(--text-color) !important;
+    }
+
+    ::deep .mud-input {
+        .mud-input-adornment-icon {
+            fill: var(--text-color);
+            z-index: 2;
+        }
+
+        .mud-input-slot {
+            z-index: 2;
+        }
+    }
+}
+
+::deep .sidebar-buttons {
+
+    .mud-button-label {
+        color: var(--text-color);
+    }
+
+    .option-btn-sidebar {
+        .mud-icon-button-label {
+            .mud-svg-icon {
+                fill: var(--text-color);
+            }
+        }
+    }
+}
+
+.sidebar-footer {
+    ::deep .to-options {
+        color: var(--text-color);
+
+
+        .mud-icon-root.mud-svg-icon {
+            fill: var(--text-color);
+        }
+    }
+}
+
+.options-container {
+
+    ::deep button {
+
+        .mud-button-label {
+            color: #EEE;
+        }
+    }
+}
+
+
+@media (max-width: 1080px) {
+    .sidebar-container {
+        position: absolute;
+        left: -300px;
+        z-index: 10;
+        top: 0;
+        transition: .33s;
+        width: 250px;
+        left: -80vw;
+    }
+}
+
+
+@media (max-width: 600px) {
+    .sidebar-container {
+        position: absolute;
+        left: -300px;
+        z-index: 10;
+        top: 0;
+        transition: .33s;
+        width: 80vw;
+        left: -80vw;
+
+        .close {
+            height: 0px!important;
+
+            ::deep button {
+                opacity: 0 !important;
+            }
+
+            &options-container{
+               
+            }
+        }
+    }
+}

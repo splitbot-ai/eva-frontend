@@ -1,0 +1,372 @@
+﻿[
+  {
+    "outputFile": "Views/Chat.razor.css",
+    "inputFile": "Views/Chat.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Login.razor.css",
+    "inputFile": "Views/Login.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/PreLoadPage.razor.css",
+    "inputFile": "Views/PreLoadPage.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Test.razor.css",
+    "inputFile": "Views/Test.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/SettingsDialog.razor.css",
+    "inputFile": "Views/SettingsDialog.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/RegistrationMessage.razor.css",
+    "inputFile": "Views/RegistrationMessage.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/UploadDialog.razor.css",
+    "inputFile": "Views/UploadDialog.razor.scss"
+  },
+  {
+    "outputFile": "Views/Crawler.razor.css",
+    "inputFile": "Views/Crawler.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/CustomInstruction.razor.css",
+    "inputFile": "Views/CustomInstruction.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/styles/modal-style.css",
+    "inputFile": "Views/styles/modal-style.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/CrawlerDialog.razor.css",
+    "inputFile": "Views/CrawlerDialog.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Pullables/SourcePullable.razor.css",
+    "inputFile": "Views/Pullables/SourcePullable.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/OnPremise.razor.css",
+    "inputFile": "Views/OnPremise.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/NextCloud.razor.css",
+    "inputFile": "Views/NextCloud.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/ToolTip.razor.css",
+    "inputFile": "Views/Components/ToolTip.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "wwwroot/css/app.css",
+    "inputFile": "wwwroot/css/app.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/SourcesList.razor.css",
+    "inputFile": "Views/Components/SourcesList.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/PopUP.razor.css",
+    "inputFile": "Views/Components/PopUP.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Rename.razor.css",
+    "inputFile": "Views/Rename.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/PDFViewer.razor.css",
+    "inputFile": "Views/Components/PDFViewer.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Feedback.razor.css",
+    "inputFile": "Views/Feedback.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/SideBar.razor.css",
+    "inputFile": "Views/Components/SideBar.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/NavBar.razor.css",
+    "inputFile": "Views/Components/NavBar.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "Views/Components/ChatInput.razor.css",
+    "inputFile": "Views/Components/ChatInput.razor.scss"
+  },
+  {
+    "outputFile": "Views/Components/ChatRoom.razor.css",
+    "inputFile": "Views/Components/ChatRoom.razor.scss"
+  },
+  {
+    "outputFile": "Views/MainComponents/ChatRoom.razor.css",
+    "inputFile": "Views/MainComponents/ChatRoom.razor.scss"
+  },
+  {
+    "outputFile": "Views/Layout/MainLayout.razor.css",
+    "inputFile": "Views/Layout/MainLayout.razor.scss"
+  },
+  {
+    "outputFile": "Views/Pages/ExternalResources/ExternalResources.razor.css",
+    "inputFile": "Views/Pages/ExternalResources/ExternalResources.razor.scss"
+  },
+  {
+    "outputFile": "Views/OtherComponents/E-Mail.razor.css",
+    "inputFile": "Views/OtherComponents/E-Mail.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/EmailComponents/EMailAdd.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/EmailComponents/EMailAdd.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CustomInstructionComponents/CustomInstruction.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CustomInstructionComponents/CustomInstruction.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/WebCrawler.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/WebCrawler.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/AddWeb.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/AddWeb.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/ManageWeb.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/WebCrawlerComponents/ManageWeb.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/FileManager.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/FileManager.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/AddFileManager.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/AddFileManager.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/ManageFile.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/ManageFile.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/EmailComponents/IMAP.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/EmailComponents/IMAP.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/EmailComponents/ManageEmail.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/EmailComponents/ManageEmail.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/AddNextCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/AddNextCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/NextCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/NextCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/ManageNextCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/NextCloudComponents/ManageNextCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/AddFile.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/FileManagerComponents/AddFile.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/EmailComponents/EMail.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/EmailComponents/EMail.razor.scss"
+  },
+  {
+    "outputFile": "Views/MainComponents/SideBar.razor.css",
+    "inputFile": "Views/MainComponents/SideBar.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ScheduleTask/Task.razor.css",
+    "inputFile": "Views/PagesComponents/ScheduleTask/Task.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ChatRoom/ChatInput.razor.css",
+    "inputFile": "Views/PagesComponents/ChatRoom/ChatInput.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/ExternalResources.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/ExternalResources.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/EmailComponents/AddEmail.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/EmailComponents/AddEmail.razor.scss"
+  },
+  {
+    "outputFile": "Views/OtherComponents/SourcesList.razor.css",
+    "inputFile": "Views/OtherComponents/SourcesList.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/FileBrowser.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/FileBrowser.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/OutLookComponents/OutLook.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/OutLookComponents/OutLook.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/Cloud/Cloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/Cloud/Cloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/AddCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/AddCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/ManageCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/ManageCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/OneDriveComponents/AddOneDrive.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/OneDriveComponents/AddOneDrive.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/Cloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/Cloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/NextCloudComponents/ManageNextCloud.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/NextCloudComponents/ManageNextCloud.razor.scss"
+  },
+  {
+    "outputFile": "Views/AnimationComponents/LeapFrog.razor.css",
+    "inputFile": "Views/AnimationComponents/LeapFrog.razor.scss"
+  },
+  {
+    "outputFile": "Views/AnimationComponents/Squircle.razor.css",
+    "inputFile": "Views/AnimationComponents/Squircle.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ExternalResources/CloudComponents/CloudFileBrowser.razor.css",
+    "inputFile": "Views/PagesComponents/ExternalResources/CloudComponents/CloudFileBrowser.razor.scss"
+  },
+  {
+    "outputFile": "Views/OtherComponents/SourcesList.razor.css",
+    "inputFile": "Views/OtherComponents/SourcesList.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/ChatRoom/ChatRoom.razor.css",
+    "inputFile": "Views/PagesComponents/ChatRoom/ChatRoom.razor.scss"
+  },
+  {
+    "outputFile": "Views/Layout/SideBar.razor.css",
+    "inputFile": "Views/Layout/SideBar.razor.scss"
+  },
+  {
+    "outputFile": "Views/Components/PageWrapper.razor.css",
+    "inputFile": "Views/Components/PageWrapper.razor.scss"
+  },
+  {
+    "outputFile": "Views/Components/ManagePage.razor.css",
+    "inputFile": "Views/Components/ManagePage.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/AgentCard.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/AgentCard.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/AgentsCategory.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/AgentsCategory.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/GeneralAgent.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/GeneralAgent.razor.scss"
+  },
+  {
+    "outputFile": "Views/ModalComponents/Rename.razor.css",
+    "inputFile": "Views/ModalComponents/Rename.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/AgentListModal.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/AgentListModal.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/MonitorAgent.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/MonitorAgent.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/AgentCardRunning.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/AgentCardRunning.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/ModalAgent/GeneralModalAgent.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/ModalAgent/GeneralModalAgent.razor.scss"
+  },
+  {
+    "outputFile": "Views/PagesComponents/AgentsComponent/ModalAgent/MonitoringModalAgent.razor.css",
+    "inputFile": "Views/PagesComponents/AgentsComponent/ModalAgent/MonitoringModalAgent.razor.scss"
+  },
+  {
+    "outputFile": "Views/ModalComponents/SourcesList.razor.css",
+    "inputFile": "Views/ModalComponents/SourcesList.razor.scss"
+  }
+]

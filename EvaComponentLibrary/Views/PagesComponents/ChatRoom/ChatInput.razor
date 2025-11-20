@@ -1,0 +1,270 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.References;
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop;
+@using Microsoft.Extensions.Options;
+@using System.Text.RegularExpressions;
+@using Microsoft.AspNetCore.Components;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject ViewModels.MainViewModel _vm;
+@inject ViewModels.UploadManagerController _uc;
+@inject Services.SaveStringServices _saveManager;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime _js;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject IOptions<HostSettings> _hostSettings;
+
+
+<div class="main chat-input-container" id="chat-input" style=" height: 84.88px;">
+    <div class="entry-container">
+
+         @if (_hostSettings.Value.Brandname.Contains("Eva")){
+
+            @* Hier den Avatar nur für Eva Build hinzufügen. *@
+        <div class="Eva-avatar">
+
+            <img id="Eva-head" class="@(_IsMessageSending ? "sending" : string.Empty) " src="_content/EvaComponentLibrary/img/Eva-head.png" />
+            <img src="_content/EvaComponentLibrary/img/Eva-hands.png" />
+        </div>
+         }
+        
+  
+
+        <div class="chat-input">
+            <textarea class="chat-textarea @(string.IsNullOrEmpty(_message) ? "chat-textarea-shrink" : string.Empty)" id="textbox"
+            rows="1"
+            tabindex="0"
+                      placeholder="@(string.Format(@_locals["_msgPlaceholder"], _hostSettings.Value.Brandname))"
+            @bind="_message"
+            @bind:event="oninput">
+            </textarea>
+            <div class="attachment-container">
+                <div class="folder-btn">
+
+                    <div class="notification @(_lg.NumberOfSelectedSources.Equals(0)?  "hide-the-info-buttons" : string.Empty) ">@_lg.NumberOfSelectedSources</div>
+                    <MudIconButton Icon="@Icons.Material.Outlined.Inventory2" Size="Size.Medium" OnClick="OpenPullupSoures"></MudIconButton>
+                </div>
+                <div class="websearch">
+                    <div class="tabs-container">                       
+                        <label class="switch">
+                            <img class="icon @(_doWebseach ? "active-web" : string.Empty)" src="_content/EvaComponentLibrary/img/webon.svg" />
+                            <input type="checkbox" @bind="_doWebseach" @onclick="WebsearchAlert">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <button class="send-btn" disabled="@((_IsMessageSending && sendBtnDisabled))" id="sendBtn"  @onclick="() => SendMessage(_message)">
+                    @if (!_IsMessageSending && !sendBtnDisabled)
+                    {
+                        <MudIcon Class="@(!string.IsNullOrEmpty(_message?.Trim()) ? "mud-icon-active" : string.Empty)" Icon="@Icons.Material.Filled.Send"></MudIcon>
+                    }
+                    else
+                    {
+                        <MudProgressCircular Class="icon" Color="Color.Default" Indeterminate="true" Size="Size.Small" />
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="_content/EvaComponentLibrary/js/ChatInput.js"></script>
+@code{
+    [Parameter]
+    public EventCallback<string> RoomIdInURL { get; set; }
+    [Parameter]
+    public bool IsMessageSending
+    {
+        get { return _IsMessageSending; }
+        set { _IsMessageSending = value; }
+    }
+    [Parameter]
+    public EventCallback<string> OnSendMessage{ get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    private bool _IsMessageSending = false;
+    private string? _message;
+    private int _numberOfSelectedSources = 0;
+    private bool _doWebseach = false;
+    public bool sendBtnDisabled = false;
+    private bool _isLoading;
+    private bool _IsShiftPressed = false;
+    private List<string> UrlList = new();
+    private string _popMessageUrl;
+    private bool _openPopUp;
+    private bool _errorOccurred = false;
+    private string _tempMessage;
+    private bool _tempDoWebSearch;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        if (!_vm.HasSession())
+        {
+
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+        if (!_lg.Connected)
+        {
+            sendBtnDisabled = true;
+        }
+
+
+        string webseach = await _saveManager.GetStringByKeyAsync("websearch");
+
+        if (string.IsNullOrEmpty(webseach))
+        {
+            await _saveManager.SaveStringByKeyAsync("websearch", _doWebseach ? "true" : "false");
+        } else
+        {
+            _doWebseach = webseach.Equals("true") ? true : false;
+            _vm.DoWebsearch = _doWebseach;
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+                
+            });
+        }
+        _vm.WebsocketConnectionState += WebsocketState;
+        _vm.OnMessageReceived += MessageReceivedAsync;
+        //_vm.UpdateInterface += StateHasChanged;
+        _ws.SafeToken += SafeTokenAsync;
+        _lg.update += StateHasChanged;
+    }
+    private void TogglePopUp()
+    {
+        _openPopUp = !_openPopUp;
+    }
+    private async Task OpenPullupSoures()
+    {
+
+        _lg.TriggerSourcePullable?.Invoke(true);
+
+        if (!_uc.FilesContainer.Any())
+        {
+            _lg.SourcePullableIsLoading = true;
+            await _uc.InitFiles();
+        }
+        if (!_vm.SitesSaved.Any())
+        {
+            _lg.SourcePullableIsLoading = true;
+            await _vm.InitWebSave();
+        }
+        await Task.Delay(1000);
+        _vm.MergeFilesContainerToSources();
+        _vm.MergeSitesSavedToSources();
+        _lg.SourcePullableIsLoading = false;
+        _lg.UpdateSourcePullable?.Invoke();
+
+    }
+    private void WebsearchAlert()
+    {
+
+        _doWebseach = !_doWebseach;
+        //( "Webserch :"+ _doWebseach);
+        _saveManager.SaveStringByKeyAsync("websearch", _doWebseach ? "true" : "false").ConfigureAwait(false);
+
+        _vm.DoWebsearch = _doWebseach;
+        //(_doWebseach);
+        if (_doWebseach)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add(_locals["_webAct"], Severity.Success, config =>
+            {
+                config.VisibleStateDuration = 1000;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+
+            });
+        }
+        else
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+            Snackbar.Add(_locals["_webDeAct"], Severity.Error, config =>
+            {
+                config.VisibleStateDuration = 1000;
+                config.SnackbarVariant = Variant.Filled;
+                config.CloseAfterNavigation = true;
+                config.ShowCloseIcon = false;
+
+            });
+        }
+    }
+    public async Task SendMessage(string? msg)
+    {
+        if (_IsMessageSending)
+            return;
+        FindUrl(msg);
+        _message = string.Empty;
+        await OnSendMessage.InvokeAsync(msg);
+    }
+
+    private void FindUrl(string? msg)
+    {
+        UrlList.Clear();
+        string pattern = @"((http|https):\/\/|www\.)[A-Za-z0-9\-\.]+\.[A-Za-z]{2,}(/[A-Za-z0-9_\-./]*)*";
+        ;
+        Regex regex = new Regex(pattern);
+
+
+        if (!string.IsNullOrEmpty(msg))
+        {
+
+            MatchCollection matches = regex.Matches(msg);
+
+            if (matches.Cast<Match>().Any())
+            {
+                // UrlList = matches.Cast<Match>().Select(x => x.Value).ToList();
+                // UrlList = UrlList.Select(_vm.NormalizeUrl).ToList();
+
+                UrlList = matches.Cast<Match>()
+                .Select(url => url.Value)
+                .Select(_vm.NormalizeUrl)
+                .Where(url => Uri.TryCreate(url, UriKind.Absolute, out var ValidatedUri))
+                .ToList();
+
+                foreach (var source in _vm.SitesSaved)
+                {
+                    UrlList.RemoveAll(url => source.Url.Equals(url, StringComparison.OrdinalIgnoreCase));
+                }
+            }
+            if (UrlList.Any())
+            {
+                _popMessageUrl = _locals["_saveMessage"];
+                TogglePopUp();
+            }
+        }
+    }
+    private void WebsocketState(bool isDisabled)
+    {
+
+        sendBtnDisabled = isDisabled;
+        _ = InvokeAsync(StateHasChanged).ConfigureAwait(false);
+    }
+    private async void MessageReceivedAsync()
+    {
+        _IsMessageSending = false;
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+    public async void SafeTokenAsync(string token) =>
+        await _saveManager.SaveStringByKeyAsync("user", token);
+
+    private void TryAgain()
+    {
+        _vm.AddMessage(_tempMessage, _tempDoWebSearch ? "allow" : "off");
+        _errorOccurred = false;
+    }
+}

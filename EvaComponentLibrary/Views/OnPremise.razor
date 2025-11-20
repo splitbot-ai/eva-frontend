@@ -1,0 +1,158 @@
+﻿@using Microsoft.Extensions.Localization;
+@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject NavigationManager NavigationManager;
+@inject EvaComponentLibrary.ViewModels.LoginViewModel _lm;
+@inject ISnackbar Snackbar;
+
+<div class=" main main-container">
+	<div class="img-container">
+		<img src="_content/EvaComponentLibrary/img/white-logo.svg" alt="Alternate Text" />
+	</div>
+	<div class="form-container">
+		<div class="input-container">
+
+			<div class="input-tooltip">
+
+				<MudTextField Immediate="true" @onkeydown="@Enter" @bind-Value="_authServer" Label="@_locals["_authServer"]" Required Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.ErrorOutline" OnAdornmentClick="InfoAuthServer"></MudTextField>
+
+			</div>
+
+			<div class="input-tooltip">
+
+				<MudTextField Immediate="true" @onkeydown="@Enter" @bind-Value="_realm" Label="@_locals["_realm"]" Required Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.ErrorOutline" OnAdornmentClick="InfoRealm"></MudTextField>
+
+
+			</div>
+			<div class="input-tooltip">
+
+				<MudTextField Immediate="true" @onkeydown="@Enter" @bind-Value="_host" Label="@_locals["_host"]" Required Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.ErrorOutline" OnAdornmentClick="InfoHost"></MudTextField>
+
+			</div>
+
+
+		</div>
+		<MudButton Disabled="@(string.IsNullOrEmpty(_authServer) || string.IsNullOrEmpty(_realm) || string.IsNullOrEmpty(_host))" @onkeydown="@Enter" OnClick="SaveNewServer"
+				   Variant="Variant.Outlined" Color="Color.Secondary">@_locals["_save"]</MudButton>
+		<div class="go-back">
+			<MudIconButton Icon="@Icons.Material.Filled.ArrowBack" aria-label="github" />
+			<a href="login">@_locals["_backToLogin"]</a>
+		</div>
+	</div>
+</div>
+
+<EvaComponentLibrary.Views.Components.ToolTip Open="_openInfo" OnClose="Infohnadler" Info="@_message"></EvaComponentLibrary.Views.Components.ToolTip>
+
+
+
+
+@code {
+
+	private string _authServer;
+	private string _realm;
+	private string _host;
+	private string _message;
+	private bool _openInfo;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lm.Confirmation += SaveNetworkAlert;
+
+
+	}
+
+
+
+	private void Enter(KeyboardEventArgs e)
+	{
+		if ((!string.IsNullOrEmpty(_authServer?.Trim()) &&
+		!string.IsNullOrEmpty(_realm?.Trim())) &&
+		!string.IsNullOrEmpty(_host?.Trim()) &&
+		(e.Code.Equals("Enter") ||
+		e.Code.Equals("NumpadEnter")))
+			SaveNewServer();
+
+	}
+
+
+	private async Task SaveNewServer()
+	{
+		await _saveManager.SaveStringByKeyAsync("authServer", $"{_authServer}");
+		await _saveManager.SaveStringByKeyAsync("realm", $"{_realm}");
+		await _saveManager.SaveStringByKeyAsync("host", $"{_host}");
+		_lm.SetNetwork(_authServer, _realm, _host);
+
+
+	}
+
+
+	private void SaveNetworkAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+			string message = _locals["_saveOnPremise"];
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Success, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+
+			NavigationManager.NavigateTo("/");
+
+
+		}
+		else if (isSucc == false)
+		{
+			string message = _locals["_errorOnPremise"];
+			Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			Snackbar.Add(message, Severity.Error, config =>
+			{
+				config.SnackbarVariant = Variant.Filled;
+				config.CloseAfterNavigation = true;
+				config.ShowCloseIcon = false;
+
+			});
+		}
+	}
+
+	private void Infohnadler(bool open)
+	{
+		_openInfo = open;
+	}
+
+	private void ToggleModal()
+	{
+		_openInfo = !_openInfo;	
+	}
+
+
+
+	private void InfoAuthServer()
+	{
+		_message = _locals["_authInfo"];
+		ToggleModal();
+	}
+
+	private void InfoRealm()
+	{
+		_message = _locals["_realmInfo"];
+		ToggleModal();
+	}
+
+	private void InfoHost()
+	{
+		_message = _locals["_hostInfo"];
+		ToggleModal();
+	}
+
+
+
+
+
+}

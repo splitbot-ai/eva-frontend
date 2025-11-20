@@ -1,0 +1,146 @@
+﻿@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@inject IStringLocalizer<MyStrings> _locals;
+@using EvaComponentLibrary.ViewModels;
+@inject EMailViewModel _evm;
+@inject NavigationManager NavigationManager;
+@inject Logistic _lg;
+@inject ISnackbar Snackbar;
+
+<div class="main email-container">
+    <div class="email-content-container ">
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="7">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudTextField Label="Host"
+                            @bind-Value="model.Host" For="@(() => model.Host)" autocomplete="off" Immediate="true" />
+                            <MudTextField Label="Port" Class="mt-3"
+                            @bind-Value="model.Port" For="@(() => model.Port)" Immediate="true" />
+                            <MudTextField Label="Username" Class="mt-3"
+                            @bind-Value="model.UserName" For="@(() => model.UserName)" InputType="InputType.Text" autocomplete="off" Immediate="true" />
+                            <MudTextField Label="@_locals["_pass"]" Class="mt-3"
+                                          @bind-Value="model.Password" For="@(() => model.Password)" InputType="@PasswordInput" autocomplete="off" Immediate="true" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" />
+                            <MudNumericField  HideSpinButtons="true" Label="@(string.Format(_locals["_crawlRetention"],model.CrawlRetention))" Class="mt-3"
+                            @bind-Value="model.CrawlRetention" For="@(() => model.CrawlRetention)" autocomplete="off" Immediate="true" />
+                            <MudSwitch @bind-Value="model.Active" Color="Color.Primary" Label="@(string.Format(_locals["_emailAcc"], model.Active? _locals["_active"] : _locals["_deactivated"]))" />
+                            <MudSwitch @bind-Value="model.Attachment" Color="Color.Primary" Label="@(string.Format(_locals["_emailAtt"], model.Attachment? _locals["_yes"] : _locals["_no"]))" />
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.body2" Align="Align.Center" Color="@_messageColor">
+                                    @_locals[_alertMessage]
+                                </MudText>
+                            </MudItem>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton OnClick="GoBack" Variant="Variant.Filled" Color="Color.Default" Class="ml-auto">@_locals["_cancel"]</MudButton>
+                            <MudButton Disabled="@(string.IsNullOrEmpty(model.Host) || string.IsNullOrEmpty(model.UserName) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.UserName) || string.IsNullOrEmpty(model.UserName)? true : false)" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">@_locals["_connect"]</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body2" Align="Align.Center" Color="@_messageColor">
+                        @_locals[_alertMessage]
+                    </MudText>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </div>
+</div>
+
+
+@code{
+    [Parameter]
+    public string SubTab { set; get; }
+    public string ConformationMessage { get; set; } = string.Empty;
+    Models.Mail.IMAP model;
+    bool success;
+    private string _alertMessage = string.Empty;
+    private Color _messageColor;
+    private bool _isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    private void GoBack(){
+        NavigationManager.NavigateTo("/res/mail/add");
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+        model = new Models.Mail.IMAP();
+    }
+    private async Task OnValidSubmit(EditContext context)
+    {
+
+        var result =await _evm.IMAPRegistration(model);
+        if (result.Contains("OK"))
+        {
+            _messageColor = Color.Success;
+            _alertMessage = "_addEmailAccount";
+            model.Host = string.Empty;
+            model.UserName = string.Empty;
+            model.Password = string.Empty;
+            model.Attachment = false;
+            model.CrawlRetention = 30;
+            model.Active = true;
+            return;
+        }
+        else if (result.Contains("Unauthorized"))
+        {
+            _messageColor = Color.Error;
+            _alertMessage = "_incorrectCredentials";
+            model.Host = string.Empty;
+            model.UserName = string.Empty;
+            model.Password = string.Empty;
+            model.Attachment = false;
+            model.CrawlRetention = 30;
+            model.Active = true;
+            return;
+        }
+        else if (result.Contains("Conflict"))
+        {
+            _messageColor = Color.Warning;
+            _alertMessage = "_emailExists";
+            return;
+        }
+        else
+        {
+            _messageColor = Color.Error;
+            _alertMessage = "_genError";
+            model.Host = string.Empty;
+            model.UserName = string.Empty;
+            model.Password = string.Empty;
+            model.Attachment = false;
+            model.CrawlRetention = 30;
+            model.Active = true;
+            return;
+        }
+    }
+    private async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+
+    void ButtonTestclick()
+    {
+        @if (_isShow)
+        {
+            _isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            _isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}

@@ -1,0 +1,226 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.Agent
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Views.Components;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.MonitoringViewModel _monitorvm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+@inject MySnackBar _sn;
+
+<Modal ToggleModal="ToggleOpen" MaxHeight="640px" Name="_agentWeb">
+	<Body>
+		<div class="body-container">
+			<div class="search-container">
+				<input class="input-field"
+					   type="search"
+					   @bind="_url"
+					   @bind:event="oninput"
+					   @onkeydown="AddToUrlList"
+					   placeholder="@_locals["_addWebsite"]" />
+
+				@if (FilteredSites?.Any() == true)
+				{
+					<div class="autocomplete">
+						<ul class="suggestions">
+							@foreach (var site in FilteredSites)
+							{
+								<button tabindex="0" class="web-elem" @onclick="() => SelectSite(site.Url)">
+									@site.Url
+								</button>
+							}
+						</ul>
+					</div>
+				}
+				<MudButton Class="normal-btn"
+						   OnClick="AddToList" Variant="Variant.Filled"
+						   Color="Color.Primary">@_locals["_addUrl"]</MudButton>
+			</div>
+			<div class="wrapper">
+				<div class="list-container">
+					<table>
+						<colgroup>
+							<col style="width:10px" />
+							<col style="width:50%" />
+							<col style="width:40%" />
+							<col style="width:10%" />
+						</colgroup>
+						<thead>
+							<tr class="select-all">
+								<th>@* <MudCheckBox class="" value="SelectAll" ValueChanged="(bool val) => ChangeAllItemState(val)" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox> *@</th>
+								<th>@_locals["_website"]</th>
+								<th></th>
+								<th>
+									<div class="del-btn" style="@(_monitorvm.DeletedTempLinks.Any() ? string.Empty : "display:none;")" @onclick="_monitorvm.MarkingAsDeleted">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" b-ao8veiq8na=""><path fill="currentColor" d="M16 9v10H8V9zm-1.5-6h-5l-1 1H5v2h14V4h-3.5zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2z" b-ao8veiq8na=""></path></svg>
+
+									</div>
+								</th>
+							</tr>
+
+						</thead>
+						<tbody>
+							@if (_monitorvm.AgentsRelatedToTheRoom.Any())
+							{
+								foreach (var agent in _monitorvm.AgentsRelatedToTheRoom)
+								{
+									<tr>
+										<td>
+											@* @if (false)
+											{
+												<MudCheckBox class="" value="agent.CheckBoxState" ValueChanged="(bool val) => OnCheckChanged(agent, val)" Size="Size.Small" TriState="true" Color="Color.Primary"></MudCheckBox>
+											} *@
+										</td>
+										<td><p>@agent.Url</p></td>
+										<td>
+											@if (agent.Status == LinkStatus.Added)
+											{
+												<p>@_locals["_added"]</p>
+											}
+										</td>
+										<td>
+											<div class="delete-button" @onclick="_ => deleteUrl(agent.Url)">
+												<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="m9 15l6-6m0 6L9 9" /></g></svg>
+											</div>
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</Body>
+
+	<Footer>
+		<div class="footer-container">
+
+			@* <div class="save-btn">
+				<MudButton
+						   OnClick="AddToList"  Variant="Variant.Filled"
+						   Color="Color.Primary">@_locals["_save"]</MudButton>
+			</div> *@
+		</div>
+	</Footer>
+</Modal>
+
+
+@code {
+
+	[Parameter] public EventCallback<bool> OnClose { get; set; }
+	public bool SelectAll { get; set; }
+	private string? _url = string.Empty;
+	private List<Website> _safedWebsites = new();
+	private List<Website> FilteredSites = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await _vm.InitWebSave();
+		_safedWebsites = _vm.SitesSaved.ToList();
+		await base.OnInitializedAsync();
+	}
+	private void OnCheckChanged(MonitoringAgent agent, bool val)
+	{
+		_monitorvm.ChangeCheckBoxState(agent, val);
+	}
+	private void ChangeAllItemState(bool val)
+	{
+		SelectAll = val;
+		_monitorvm.ChangeAllCheckBoxState(val);
+	}
+	private void AddToUrlList(KeyboardEventArgs args)
+	{
+		if (string.IsNullOrWhiteSpace(_url?.Trim()))
+		{
+			FilteredSites.Clear();
+			return;
+		}
+		try
+		{
+			FilteredSites = _safedWebsites
+					.Where(s => s.Url.Contains(_url, StringComparison.OrdinalIgnoreCase))
+					.ToList();
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.Message);
+		}
+
+		if (args.Key.Equals("Enter"))
+			AddToList();
+	}
+	private async Task AddToList()
+	{
+		if (!string.IsNullOrWhiteSpace(_url))
+		{
+			var normalizedUrl = _vm.NormalizeUrl(_url);
+			if (_monitorvm.TryAddLink(normalizedUrl))
+			{
+				_sn.PoPSnackBar("_existedLink", Severity.Warning);
+				return;
+			}
+			var result = await _monitorvm.AddnewLinkToMonitors(normalizedUrl);
+			@if (result.Equals("OK"))
+			{
+				_monitorvm.AgentsRelatedToTheRoom?.Add(new MonitoringAgent
+				{
+					RoomId = _monitorvm.CurrentAgentRoomId,
+					Url = normalizedUrl,
+					Status = LinkStatus.Added,
+					UserId = _vm.UserInfo.UserId
+				});
+				_url = string.Empty;
+				FilteredSites.Clear();
+				return;
+			}
+			_sn.SnackBarManager(result);
+		}
+	}
+	private void ReadyToDelete()
+	{
+		_monitorvm.MarkingAsDeleted();
+	}
+	private void SelectSite(string url)
+	{
+		_url = url;
+		FilteredSites.Clear();
+	}
+	private void RemoveFromList(string url)
+	{
+		_monitorvm.Websites.Remove(url);
+		var itemToRemove = _monitorvm.AgentsRelatedToTheRoom.FirstOrDefault(x => x.Url.Equals(url));
+		_monitorvm.AgentsRelatedToTheRoom.Remove(itemToRemove);
+		_safedWebsites.Add(_vm.SitesSaved?.FirstOrDefault(w => w.Url.Equals(url)));
+	}
+	private async Task deleteUrl(string url)
+	{
+		var result = await _monitorvm.DeleteMonitor(url);
+		if (!result.Equals("OK"))
+		{
+			_sn.SnackBarManager(result);
+			return;
+		}
+		var itemToRemove = _monitorvm.AgentsRelatedToTheRoom.FirstOrDefault(x => x.Url.Equals(url));
+		_monitorvm.AgentsRelatedToTheRoom.Remove(itemToRemove);
+
+	}
+	private void ToggleOpen()
+	{
+
+		OnClose.InvokeAsync(false);
+		_monitorvm.DeletedTempLinks.Clear();
+		_monitorvm.AgentsRelatedToTheRoom?.Clear();
+		// _safedWebsites.Clear();
+		// FilteredSites.Clear();
+		// SelectAll = false;
+	}
+
+}

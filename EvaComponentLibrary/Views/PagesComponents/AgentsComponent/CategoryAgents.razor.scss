@@ -1,0 +1,64 @@
+﻿@import "../../styles/light-dark.scss";
+
+.component-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 50px;
+
+    section {
+        width: 100%;
+
+        h3 {
+            font-family: 'roboto-medium';
+            color: black;
+            margin-left: 16px;
+            color:var(--text-color);
+        }
+    }
+
+    .agent-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        height: fit-content;
+        width: 100%;
+        justify-content: space-evenly;
+        align-content: flex-start;
+        padding: 10px;
+        column-gap: 30px;
+        background-color: var(--sidebar-color);
+        border-radius: 20px;
+    }
+
+    .agent-list-wrapper {
+        display: grid;
+        flex-wrap: wrap;
+        height: fit-content;
+        grid-template-columns: repeat(auto-fill, 150px);
+        width: 100%;
+        align-content: flex-start;
+        padding: 10px;
+        column-gap: 30px;
+        background-color: var(--sidebar-color);
+        border-radius: 20px;
+        gap: 20px;
+        overflow-y: auto;
+    }
+}
+
+@media(max-width : 50rem) {
+    .component-wrapper {
+
+        .agent-wrapper {
+            justify-content: space-evenly;
+        }
+
+        .agent-list-wrapper {
+            justify-content: center;
+        }
+    }
+}

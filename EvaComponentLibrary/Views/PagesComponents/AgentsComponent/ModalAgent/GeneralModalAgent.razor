@@ -1,0 +1,35 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.Agent
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Views.Components;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.MonitoringViewModel _monitorvm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+@inject MySnackBar _sn;
+
+<Modal ToggleModal="ToggleOpen" MaxHeight="700px" Name="_agentGen">
+	<Body>
+		<div class="body-container">
+			<GeneralAgent TitleDisable="true" EditableTask="true"/>
+		</div>
+	</Body>
+</Modal>
+
+
+@code {
+	[Parameter] public EventCallback<bool> OnClose { get; set; }
+	private void ToggleOpen()
+	{
+
+		OnClose.InvokeAsync(false);
+	}
+
+}

@@ -1,0 +1,147 @@
+﻿@import "../styles/light-dark.scss";
+
+.main{
+
+}
+.navbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-around;
+    height: 75px;
+    width: 100%;
+    background-color: var(--background-color);
+
+    ::deep .mud-tooltip-root {
+        .mud-icon-button {
+            color: var(--text-color);
+        }
+    }
+
+    ::deep .mud-input-control {
+        .mud-switch-track {
+            background-color: var(--highlight-color);
+        }
+    }
+
+    ::deep .rounded-icon {
+        background-color: unset;
+        border-radius: 50%;
+        padding: 5px;
+        width: 30px;
+        height: 30px;
+        cursor:pointer;
+        path {
+            color: var(--text-color);
+        }
+    }
+
+    button {
+        span {
+            background-color: var(--text-color);
+        }
+    }
+
+    ::deep .new-chat {
+        color: var(--text-color);
+    }
+
+    button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 10px;
+        display: none;
+
+        span {
+            position: absolute;
+            border-radius: 50%;
+            width: 5px;
+            height: 5px;
+            background-color: var(--text-color);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: .33s;
+        }
+
+        span:nth-child(1) {
+            top: calc(50% - 10px);
+            left: calc(50% - 10px);
+        }
+
+        span:nth-child(2) {
+            top: calc(50% - 10px);
+            left: calc(50%);
+        }
+
+        span:nth-child(3) {
+            top: calc(50% - 10px);
+            left: calc(50% + 10px);
+        }
+
+        span:nth-child(4) {
+            top: calc(50%);
+            left: calc(50% - 10px);
+        }
+
+        span:nth-child(5) {
+            top: calc(50%);
+            left: calc(50%);
+        }
+
+        span:nth-child(6) {
+            top: calc(50%);
+            left: calc(50% + 10px);
+        }
+
+        span:nth-child(7) {
+            top: calc(50% + 10px);
+            left: calc(50% - 10px);
+        }
+
+        span:nth-child(8) {
+            top: calc(50% + 10px);
+            left: calc(50%);
+        }
+
+        span:nth-child(9) {
+            top: calc(50% + 10px);
+            left: calc(50% + 10px);
+        }
+    }
+
+
+
+
+    img {
+        height: 50%;
+        opacity: .5;
+        -webkit-filter: var(--invert0-img);
+        filter: var(--invert100-img);
+    }
+
+
+
+    ::deep .mud-icon-button-label {
+        color: var(--text-color);
+    }
+    }
+
+
+
+    @media (max-width: 1080px) {
+        .navbar {
+            button {
+                display: block;
+            }
+
+            ::deep .mud-input-control-boolean-input {
+                flex: 1;
+                margin-left: 0;
+            }
+        }
+    }

@@ -1,0 +1,200 @@
+﻿@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.Views;
+@using EvaComponentLibrary.Views.ModalComponents;
+@using EvaComponentLibrary.Views.Components;
+@using EvaComponentLibrary.Views.PagesComponents.AgentsComponent.ModalAgent;
+
+@using EvaComponentLibrary.ViewModels;
+@inject MainViewModel _vm;
+@inject WebServices _ws;
+@inherits LayoutComponentBase;
+@inject Logistic _lg;
+@inject ScheduledTaskViewModel _stvm;
+@inject UploadManagerController _uc;
+
+
+<main class=" main main-container @(_isSideOpen ? "open" : string.Empty)">
+
+	<MudSwipeArea OnSwipeEnd="InSwipeNav">
+		<SideBar RoomType="SetRoomType" IsSideOpen="_isSideOpen" OnClose="SideBarHandler" OnToggleSettings="SettingsHandler" OnToggleRename="RenameHandler"></SideBar>
+	</MudSwipeArea>
+	<div class="full-chat-container">
+		<NavBar IsSideOpen="_isSideOpen" OnToggle="SideBarHandler"></NavBar>
+
+		@ChildContent
+
+	</div>
+</main>
+<SettingsDialog Platform="@Platform" OnClose="SettingsHandler" Open="_openSettings" UserName="@UserName"></SettingsDialog>
+<PDFViewer Open="_pdfViewer" PDFLoading="_pdfLoading" OnClose="PDFViewerHandler"></PDFViewer>
+@* <PopUP Open="_openPopUp" OnClose="PopUpHandler" Action="SaveUrl" Message="@_popMessageUrl" List="UrlList"></PopUP> *@
+<SourcesList Platform="@Platform" MessageId="@_messageId" Loading="PDFLoadingHandler" PDFViewer="PDFViewerHandler" Open="_openSourcesList" OnClose="SourcesListHandler" MessageItems="@_vm.MessageItems.ToList()"></SourcesList>
+<SourcePullable Open="_openPullupSources" OnClose="PullupHandler"></SourcePullable>
+<FeedBack OnClose="FeedBackHandler" Msg="_lg.FeedBackMessage" Open="_openFeedBack"></FeedBack>
+<Rename OnClose="RenameHandler" Open="_openRename"></Rename>
+@if (_openMonitoringAgent)
+{
+	<MonitoringModalAgent OnClose="MonitoringAgentHandler"></MonitoringModalAgent>
+}
+@if (_openGeneralAgetn)
+{
+	<GeneralModalAgent OnClose="GeneralModalAgentHandler"></GeneralModalAgent>
+}
+<ToolTip></ToolTip>
+
+@code {
+	[Parameter]
+	public string Platform { get; set; }
+	[Parameter]
+	public RenderFragment ChildContent { get; set; }
+	[Parameter]
+	public RoomTypes RoomType { get; set; }
+	private bool _isSideOpen;
+	private bool _openPullupSources;
+	private bool _pdfViewer;
+	private bool _pdfLoading;
+	private bool _openPopUp;
+	private string _popMessageUrl;
+	private List<string> UrlList = new();
+	private string? _messageId = string.Empty;
+	private bool _openSourcesList;
+	private bool _openSettings;
+	private string UserName;
+	private bool _openRename;
+	private bool _openFeedBack;
+	private bool _openMonitoringAgent;
+	private bool _openGeneralAgetn;
+	//-------------------------------------------------- base function -------------------------------------------------->
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_lg.onSwipe += ToggleNav;
+		_lg.TriggerSourcesList += SourcesListHandler;
+		_lg.TriggerMonitoringModalAgent += MonitoringAgentHandler;
+		_lg.TriggerGeneralModalAgent += GeneralModalAgentHandler;
+		_lg.TriggerSourcePullable += PullupHandler;
+		_lg.TriggerFeedBack += FeedBackHandler;
+		_lg.UpdateLanguage += update;
+		UserName = _ws.UserName;
+		_stvm._ws = _ws;
+		_stvm._vm = _vm;
+		_vm._stvm = _stvm;
+		_uc.MainViewModel = _vm;
+
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await Task.Delay(1000);
+			await FindUnreadMessage();
+		}
+	}
+	private void InSwipeNav(SwipeEventArgs args)
+	{
+		if (args.SwipeDirection.Equals(SwipeDirection.RightToLeft))
+			ToggleNav();
+	}
+	private void SwipeNav(SwipeEventArgs args)
+	{
+		if (!_pdfViewer)
+		{
+
+			if (args.SwipeDirection.Equals(SwipeDirection.LeftToRight))
+				ToggleNav();
+
+		}
+	}
+	private void SetRoomType(RoomTypes roomType)
+	{
+		RoomType = roomType;
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	//-------------------------------------------------- toggle function -------------------------------------------------->
+	private async void ToggleNav()
+	{
+		_isSideOpen = !_isSideOpen;
+		//("you swiped");
+		update();
+	}
+	//-------------------------------------------------- handler function -------------------------------------------------->
+	private async Task SideBarHandler(bool open)
+	{
+		_isSideOpen = open;
+	}
+	private void PDFViewerHandler(bool open)
+	{
+		_pdfViewer = open;
+	}
+	void PopUpHandler(bool open)
+	{
+		_openPopUp = open;
+	}
+	private void PDFLoadingHandler(bool open)
+	{
+		_pdfLoading = open;
+	}
+	private async void SourcesListHandler(bool open)
+	{
+		_openSourcesList = open;
+		_messageId = _lg.MessageIdSourcesList;
+		update();
+	}
+	private async void SettingsHandler(bool open)
+	{
+		_openSettings = open;
+	}
+	private async void PullupHandler(bool open)
+	{
+		_openPullupSources = open;
+		update();
+	}
+	private async void RenameHandler(bool open)
+	{
+		_openRename = open;
+	}
+	private async void FeedBackHandler(bool open)
+	{
+		_openFeedBack = open;
+		update();
+	}
+	private async void MonitoringAgentHandler(bool open)
+	{
+		_openMonitoringAgent = open;
+		update();
+	}
+	private async void GeneralModalAgentHandler(bool open)
+	{
+		_openGeneralAgetn = open;
+		update();
+	}
+	//-------------------------------------------------- other function -------------------------------------------------->
+	public async Task SaveUrl()
+	{
+		// bool result = false;
+		// foreach (var item in UrlList)
+		// {
+		// 	result = await _vm.AddNewSite(item, 1);
+		// }
+	}
+
+
+	private async Task FindUnreadMessage()
+	{
+		if (_vm.ScheduledMenuItems.Any())
+		{
+			var unreadMessage = _vm.ScheduledMenuItems.FirstOrDefault(x => x.UnreadMessage.Equals(true));
+			if (unreadMessage != null)
+			{
+				await _vm.LoadRoomAsync(unreadMessage);
+			}
+		}
+	}
+
+}

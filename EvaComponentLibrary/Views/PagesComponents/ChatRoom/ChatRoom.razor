@@ -1,0 +1,432 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Views.PagesComponents.ChatRoom;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Models.References;
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.JSInterop;
+@using System.Text.RegularExpressions;
+@using Microsoft.AspNetCore.Components;
+@using Microsoft.AspNetCore.Components.Web.Virtualization;
+@using Markdig;
+@inject ISnackbar Snackbar;
+@inject IDialogService DialogService;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject ViewModels.MainViewModel _vm;
+@inject ViewModels.UploadManagerController _uc;
+@inject Services.SaveStringServices _saveManager;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime _js;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject EvaComponentLibrary.ViewModels.OutLookViewModel _ovm;
+
+
+
+<div class="main chat-container @(!_vm.MessageItems.Any() ? "Preview-page" : string.Empty)">
+	<MudSwipeArea OnSwipeEnd="SwipeNav" id="chat-scroller" Style="height: 1%; margin-bottom:10px; width: 100%;  flex: 1; ">
+		<div class="chats @(_pdfViewer ? "no-gutter" : string.Empty)">
+			<div class="chat-entries " style="position: relative;">
+				@if (_vm.MessageItems != null && _vm.MessageItems.Any())
+				{
+					@foreach (var msg in _vm.MessageItems)
+					{
+						_messageHolder = msg;
+						var isLastMessage = msg == _vm.MessageItems.LastOrDefault();
+						if (_IsMessageSending && isLastMessage)
+						{
+							_messageHolder.IsFinished = false;
+						}
+						@if (!msg.isHuman)
+						{
+							<div class="msg-element">
+								<div class="pic-container">
+									<img class="profile-pic @(!_messageHolder.IsFinished ? "blinking-img" : string.Empty)" src="_content/EvaComponentLibrary/img/brand/profile-icon.svg" />
+								</div>
+								<div class="msg-content" style="@((isLastMessage && _vm.CurrentRoom.RoomTypes == RoomTypes.NORMAL ? "min-height:calc(-360px + 100dvh);" : string.Empty))">
+									@{
+										var renderedContent = msg.Content ?? "";
+
+										// If an image is being generated, replace it with a placeholder
+										if (msg.IsGeneratingImage)
+										{
+											renderedContent = Regex.Replace(
+											renderedContent,
+											@"!\[.*?\]\(data:image\/png;base64,[A-Za-z0-9+/=]*",
+											"<div class='image-skeleton'></div>",
+											RegexOptions.IgnoreCase
+											);
+										}
+									}
+									<MudMarkdown Styling="Styling" Value="@renderedContent" MarkdownPipeline="SafePipeline" />
+
+									<div class="source-container">
+										@if (msg.References != null && msg.References.Any())
+										{
+											var count = 0;
+											<button class="source-btn" @onclick="_ => SourcesListOpen(msg.Id)">
+												<div class="item-head">
+													<p>@_locals["_sourcesList"]...</p>
+													@foreach (var Refe in msg.References)
+													{
+														if (count < 3)
+														{
+															if (Refe is Links link && !string.IsNullOrEmpty(link.Icon))
+															{
+																<img class="pre-show icon-@count" src="@link.Icon" />
+															}
+															else if (Refe is Files file)
+															{
+																<img class="pre-show icon-@count" src="_content/EvaComponentLibrary/img/adobe.png" />
+
+																@* <svg class="mud-icon-root mud-svg-icon mud-icon-size-small" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M12.96 9.12h5.28l-5.28-5.28v5.28zM6.24 2.4h7.68l5.76 5.76v11.52c0 1.060-0.86 1.92-1.92 1.92v0h-11.52c-1.060 0-1.92-0.86-1.92-1.92v0-15.36c0-1.060 0.86-1.92 1.92-1.92v0zM10.176 11.424c-0.019 0.038-0.278 1.69-2.016 4.502 0 0-3.36 1.747-2.563 3.053 0.643 1.037 2.227-0.038 3.59-2.573 0 0 1.747-0.614 4.070-0.787 0 0 3.706 1.661 4.214-0.106 0.499-1.786-2.938-1.382-3.552-1.2 0 0-1.92-1.296-2.4-3.082 0 0 1.094-3.792-0.586-3.744s-1.046 3.005-0.758 3.936zM10.954 12.423c0.029 0.010 0.451 1.162 1.814 2.362 0 0-2.237 0.442-3.254 0.864 0 0 0.96-1.661 1.44-3.226zM14.726 15.034c0.557-0.154 2.237 0.144 2.17 0.461-0.058 0.317-2.17-0.461-2.17-0.461zM7.939 16.8c-0.509 1.19-1.382 1.92-1.603 1.92s0.672-1.536 1.603-1.92zM10.954 10.147c0-0.067-0.346-2.112 0-2.064 0.518 0.077 0 1.997 0 2.064z"></path></svg> *@
+															}
+															else if (Refe is Emails email)
+															{
+																<img class="pre-show icon-@count" src="_content/EvaComponentLibrary/img/message.png" />
+																@* <svg class="mud-icon-root mud-svg-icon mud-icon-size-small" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>Email</title><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></svg> *@
+															}
+															else if (Refe is Chat chat)
+															{
+																<img class="pre-show icon-@count" src="_content/EvaComponentLibrary/img/conversation.png" />
+
+															}
+															else
+															{
+																<svg class="mud-icon-root mud-svg-icon mud-icon-size-small icon-@count" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><!--!--><path d="M0 0h24v24H0z" fill="none"></path><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"></path></svg>
+															}
+															count++;
+														}
+													}
+												</div>
+											</button>
+										}
+									</div>
+									@if (_messageHolder.IsFinished)
+									{
+										<div class="user-interaction">
+
+											<button class="copy-btn" @onclick=" _=> Copy(msg.Content)">
+												<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>ContentCopy</title><!--!--><g><rect fill="none" height="24" width="24"></rect></g><g><path d="M15,20H5V7c0-0.55-0.45-1-1-1h0C3.45,6,3,6.45,3,7v13c0,1.1,0.9,2,2,2h10c0.55,0,1-0.45,1-1v0C16,20.45,15.55,20,15,20z M20,16V4c0-1.1-0.9-2-2-2H9C7.9,2,7,2.9,7,4v12c0,1.1,0.9,2,2,2h9C19.1,18,20,17.1,20,16z M18,16H9V4h9V16z"></path></g></svg>
+											</button>
+											<button class="like-btn"
+													@onclick="_ => ToggleFeedBack(msg, Feedback.Like)"
+													disabled="@(msg.Feedback.HasFlag(Feedback.Like)
+																	 || msg.Feedback.HasFlag(Feedback.Dislike))">
+								<svg class="mud-icon-root mud-svg-icon mud-icon-size-small
+											    @(msg.Feedback.HasFlag(Feedback.Like) ? "liked" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img">
+									<!--!-->
+									<path d="M0 0h24v24H0V0z" fill="none" opacity=".87"></path>
+									<path d="M21 8h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2zm0 4l-3 7H9V9l4.34-4.34L12.23 10H21v2zM1 9h4v12H1z"></path>
+								</svg>
+							</button>
+							<button class="dislike-btn"
+									@onclick="_ => ToggleFeedBack(msg, Feedback.Dislike)"
+									disabled="@(msg.Feedback.HasFlag(Feedback.Like)
+													 || msg.Feedback.HasFlag(Feedback.Dislike))">
+																					  								<svg class="mud-icon-root mud-svg-icon mud-icon-size-small
+											    @(msg.Feedback.HasFlag(Feedback.Dislike)
+																 ? "disliked" : string.Empty)" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img">
+									<!--!-->
+									<path d="M0 0h24v24H0V0z" fill="none" opacity=".87"></path>
+									<path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2zm0 12l-4.34 4.34L11.77 14H3v-2l3-7h9v10zm4-12h4v12h-4z"></path>
+								</svg>
+							</button>
+						</div>
+												}
+								</div>
+							</div>
+						}
+						else
+						{
+							<div class="msg-element isHuman-msg">
+								<div class="pic-container">
+									<MudAvatar Style="width: 100%; height: 100%; font-size: 12px;" Color="Color.Info">@(UserName != null ? UserName[0] : "X")</MudAvatar>
+								</div>
+								<div class="msg-content">
+									<p>
+										@msg.Content
+									</p>
+								</div>
+								<button class="copy-btn" @onclick=" _=> Copy(msg.Content)">
+									<svg class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>ContentCopy</title><!--!--><g><rect fill="none" height="24" width="24"></rect></g><g><path d="M15,20H5V7c0-0.55-0.45-1-1-1h0C3.45,6,3,6.45,3,7v13c0,1.1,0.9,2,2,2h10c0.55,0,1-0.45,1-1v0C16,20.45,15.55,20,15,20z M20,16V4c0-1.1-0.9-2-2-2H9C7.9,2,7,2.9,7,4v12c0,1.1,0.9,2,2,2h9C19.1,18,20,17.1,20,16z M18,16H9V4h9V16z"></path></g></svg>
+								</button>
+							</div>
+						}
+					}
+				}
+				else if (!_vm.LoadingRoom && !_vm.MessageItems.Any())
+				{
+					<div class="preview">
+						<h1>@_locals["_hello"] @(UserName != null ? UserName.Split(" ")[0] : string.Empty)</h1>
+						<div class="cart-container">
+							<div class="toscroll">
+								@foreach (var item in _vm.RandomizedQuestion)
+								{
+
+									var question = _question[item];
+									<button @onclick="_ => SendMessage(_locals[question])" class="cart">
+										<p class="description">@_locals[question]</p>
+									</button>
+
+								}
+							</div>
+						</div>
+					</div>
+
+				}
+				<div id="scroll-to-elem" style="position: absolute; height: 2px;"></div>
+			</div>
+		</div>
+	</MudSwipeArea>
+	@if (!_vm.MessageItems.Any())
+	{
+		<div id="preview" class="preview" style="height: 84.88px;">
+			<div class="cart-container">
+				<div class="toscroll">
+					@foreach (var item in _vm.RandomizedQuestion)
+					{
+						var question = _question[item];
+						<button @onclick="_ => SendMessage(_locals[question])" class="cart">
+							<p class="description">@_locals[question]</p>
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+	}
+	@if (_vm.CurrentRoom.RoomTypes != RoomTypes.MONITORING)
+	{
+		<ChatInput IsMessageSending="_IsMessageSending" OnSendMessage="SendMessage"></ChatInput>
+	}
+</div>
+@code {
+
+	[Parameter]
+	public string RoomIdInURL { get; set; }
+	[Parameter]
+	public EventCallback<bool> OnToggleFeedBack { get; set; }
+
+	private bool _pdfViewer = false;
+	private string UserName;
+	private string? _messageId = string.Empty;
+	private string[] _question = new string[]
+	{ "_callInSick","_writeExcuseNote", "_requestVacation", "_increaseProductivity", "_manageFinances", "_saveMoney", "_writeEffectiveReport", "_handleOvertime" };
+	private Message _msg;
+	private string msgId = string.Empty;
+	private bool _IsMessageSending = false;
+	private List<string> UrlList = new();
+	private string _popMessageUrl;
+	private string? _message;
+	private bool _openPopUp;
+	private bool _IsShiftPressed = false;
+	private bool _doWebseach = false;
+	public bool sendBtnDisabled = false;
+	private bool _openFeedBack;
+	private bool _IsDOMReady;
+	private Message _messageHolder;
+	protected override async Task OnInitializedAsync()
+	{
+		base.OnInitialized();
+		if (!_vm.HasSession())
+		{
+			NavigationManager.NavigateTo("/");
+			return;
+		}
+		// await _ovm.GetKalenderAuth();
+		sendBtnDisabled = _vm.HasNoConnection();
+		_vm.WebsocketConnectionState += WebsocketState;
+		_vm.OnMessageReceived += MessageReceivedAsync;
+		_vm.OnMsgAdded += ScrollToElem;
+		_vm.OnNewRoom += update;
+		_lg.UpdateFeedBack += update;
+		_lg.UpdateLanguage += update;
+		_vm.OnEndOfStream += ShowInteraction;
+		_vm.OnStream += OnStreamUpdate;
+		// _vm.ShowInteraction += ShowInteraction;
+
+		UserName = _ws.UserName;
+		_vm.UploadManger = _uc;
+
+	}
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		_IsDOMReady = true;
+	}
+	private void WebsocketState(bool isDisabled)
+	{
+		sendBtnDisabled = isDisabled;
+		_ = InvokeAsync(StateHasChanged).ConfigureAwait(false);
+	}
+	private void TogglePopUp()
+	{
+		_openPopUp = !_openPopUp;
+	}
+	void PopUpHandler(bool open)
+	{
+		_openPopUp = open;
+	}
+	private void SwipeNav(SwipeEventArgs args)
+	{
+		if (!_pdfViewer)
+		{
+			if (args.SwipeDirection.Equals(SwipeDirection.LeftToRight))
+				_lg.onSwipe?.Invoke();
+
+		}
+	}
+	private void SourcesListOpen(string id)
+	{
+		_lg.MessageIdSourcesList = id;
+		_lg.TriggerSourcesList?.Invoke(true);
+
+	}
+	private async Task Copy(string text)
+	{
+		await _vm.CopyToClipboard(text);
+		Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+		Snackbar.Add(_locals["_copy"], Severity.Normal, config =>
+		{
+			config.Icon = Icons.Material.Rounded.ContentCopy;
+			config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+			config.VisibleStateDuration = 1000;
+			config.CloseAfterNavigation = true;
+			config.ShowCloseIcon = false;
+
+		});
+	}
+	private async Task ToggleFeedBack(Message msg, Feedback feedback)
+	{
+		if (feedback.Equals(Feedback.Dislike))
+		{
+			_lg.FeedBackMessage = msg;
+			_lg.FeedBackMessageId = msg.Id;
+			_lg.TriggerFeedBack?.Invoke(true);
+		}
+		else
+		{
+			bool result = await _vm.PostFeedbackAsync(msg.Id, 1, string.Empty);
+			if (result)
+			{
+				msg.Feedback = Feedback.Like;
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(_locals["_feedback"], Severity.Success, config =>
+				{
+					config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+					config.VisibleStateDuration = 1000;
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+			else
+			{
+
+				Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+				Snackbar.Add(_locals["_genError"], Severity.Error, config =>
+				{
+					config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+					config.VisibleStateDuration = 1000;
+					config.SnackbarVariant = Variant.Filled;
+					config.CloseAfterNavigation = true;
+					config.ShowCloseIcon = false;
+
+				});
+			}
+		}
+	}
+	public async Task SendMessage(string? msg)
+	{
+		try
+		{
+			string? mess = string.IsNullOrEmpty(msg) ? _message : msg;
+			_message = string.Empty;
+
+			if (!string.IsNullOrEmpty(mess.Trim()))
+			{
+				_vm.AddMessage(mess, _doWebseach ? "allow" : "off");
+
+				_IsMessageSending = true;
+			}
+			_ = _js.InvokeVoidAsync("ResetInput").ConfigureAwait(false);
+			await InvokeAsync(StateHasChanged);
+		}
+		catch (Exception e)
+		{
+			//(e.Message);
+		}
+		NavigationManager.NavigateTo($"/chat/{_vm.RoomId}");
+	}
+	private async void ScrollToElem()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+
+		await _js.InvokeVoidAsync("AutoScrollToElem");
+	}
+	private async void MessageReceivedAsync()
+	{
+		_IsMessageSending = false;
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+
+		});
+		if (_IsDOMReady)
+		{
+			await _js.InvokeVoidAsync("AutoScrollToElem");
+
+		}
+	}
+
+	private async void update()
+	{
+
+		_IsMessageSending = false;
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private async void ShowInteraction()
+	{
+		if (_messageHolder is not null)
+		{
+			_messageHolder.IsFinished = true;
+		}
+		_IsMessageSending = false;
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+	private async void OnStreamUpdate()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+	private static readonly MarkdownPipeline SafePipeline =
+		new MarkdownPipelineBuilder()
+			.UseDiagrams()
+			.UseMathematics()
+			.UseEmojiAndSmiley()
+			.UseFooters()
+			.UseAdvancedExtensions()
+			.UseAdvancedExtensions()
+			.Build();
+	private static readonly MudMarkdownStyling Styling = new()
+	{
+		CodeBlock =
+		{
+			Theme = CodeBlockTheme.DraculaBase16,
+		},
+
+	};
+}

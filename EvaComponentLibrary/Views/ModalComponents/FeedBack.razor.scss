@@ -1,0 +1,300 @@
+﻿@import "../styles/light-dark.scss";
+@import "../styles/modal-style.scss";
+
+
+.modal {
+    overflow-y: auto;
+
+    .modal-body {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        overflow-y: auto;
+
+
+        .modal-head {
+            ::deep .mud-icon-button {
+                padding: 0;
+                padding-left: 10px;
+                color: var(--text-color) !important;
+            }
+
+            ::deep .mud-button-label {
+                gap: 7px;
+                font-family: 'Kanit-Bold';
+                text-transform: uppercase;
+            }
+        }
+
+        .modal-content {
+            color: var(--text-color);
+            font-family: "Kanit-Bold";
+            font-size: 1.17em;
+
+
+
+            ::deep .mud-chip-text.mud-chip-color-primary {
+                background-color: var(--background-color-chip);
+                color: var(--text-color);
+                font-family: 'roboto-light';
+            }
+
+            ::deep .mud-chip-filled.mud-chip-color-primary {
+                background-color: var(--highlight-color);
+                color: #FCFCFC;
+                font-family: 'roboto-light';
+            }
+
+            ::deep .mud-input-slot {
+                max-height: 150px;
+                height: Calc(100dvh - 380px);
+                color: var(--text-color) !important;
+                background-color: var(--secondary-color) !important;
+                padding: 15px !important;
+                border-radius: 15px;
+            }
+
+            ::deep .mud-input-filled {
+                background-color: var(--primary-color);
+                border-radius: 15px;
+
+                &:hover {
+                    background-color: var(--primary-color);
+                }
+            }
+
+            ::deep .mud-input-root-filled {
+                margin: 5px 12px 20px;
+            }
+        }
+
+
+        .modal-foot {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: auto;
+            margin-bottom: 15px;
+            margin-bottom: 40px;
+
+            ::deep .mud-button-filled-default {
+                margin-right: 15px;
+                border: 1px solid var(--highlight-color) !important;
+                color: var(--text-color);
+                border-radius: 50px !important;
+
+                &:hover {
+                    filter: brightness(80%);
+                }
+            }
+
+            ::deep .mud-button-filled-primary {
+                color: white;
+                background-color: var(--highlight-color);
+                border-radius: 50px !important;
+
+                &:hover {
+                    filter: brightness(80%);
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+::deep .modal-tabs {
+    overflow: hidden;
+    height: 100%;
+
+    .mud-tabs-tabbar {
+        background-color: #ffffff00;
+
+        .mud-tabs-tabbar-inner {
+            .mud-tabs-tabbar-content {
+                width: 100%;
+
+                .mud-tabs-tabbar-wrapper {
+                    width: 100%;
+                    justify-content: space-evenly;
+
+                    ::after {
+                        position: absolute;
+                        content: "";
+                        width: 50%;
+                        height: 5px;
+                        bottom: 0;
+                        z-index: -1;
+                        background-color: var(--highlight-color);
+                        left: 0;
+                        border-radius: 5px;
+                        transition: .33s
+                    }
+
+                    .mud-tooltip-root {
+                        color: var(--text-color);
+                        font-family: "Kanit-Bold";
+
+                        .mud-tab-active {
+                            color: var(--text-color);
+                        }
+                    }
+
+                    .mud-tab-slider {
+                        opacity: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .mud-tabs-panels {
+        overflow: hidden;
+        height: 100%;
+
+        .content {
+            overflow: hidden;
+            height: 100%;
+
+            .felx-container {
+                overflow: hidden;
+                height: 100%;
+
+                .scroll-list {
+                    overflow-y: auto;
+                    scrollbar-gutter: stable;
+                    height: 270px;
+
+                    .scroll-content {
+                    }
+                }
+            }
+
+            .mud-input-control {
+                .mud-input {
+                    .mud-input-slot {
+                        color: var(--text-color);
+                        opacity: .8;
+                    }
+                }
+
+                .mud-input-outlined-border {
+                    border-radius: 50px !important;
+                    border: 2px solid var(--highlight-color) !important;
+                    margin-bottom: 5px !important;
+                }
+
+                .mud-input-adornment {
+                    .mud-icon-root {
+                        fill: var(--highlight-color) !important;
+                    }
+                }
+
+                .mud-input {
+                    font-family: "Kanit-Bold";
+                }
+            }
+
+            .mud-switch {
+                margin: 15px 0px;
+
+                .mud-switch-span .mud-switch-track {
+                    background-color: var(--highlight-color);
+                }
+            }
+
+            .mud-button-filled.mud-button-filled-primary {
+                border-radius: 50px;
+                background-color: var(--highlight-color);
+                margin-top: 10px;
+
+                &:disabled {
+                    background-color: var(--highlight-color) !important;
+                    opacity: .5;
+                }
+            }
+        }
+    }
+}
+
+::deep .mud-list {
+    .mud-list-item {
+        .mud-list-item-text {
+            .mud-typography,
+            .mud-typography-body1 {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            a {
+                flex: 1;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                width: 160px;
+                height: 1.2em;
+                white-space: nowrap;
+            }
+
+            .del-btn {
+                color: var(--text-color);
+            }
+        }
+    }
+}
+
+
+
+::deep .mud-input-control >
+.mud-input-control-input-container >
+.mud-input-label-inputcontrol {
+    color: var(--highlight-color);
+    font-family: "Kanit-Bold";
+    background-color: var(--primary-color);
+}
+
+
+::deep .modal-tabs.slide {
+    .mud-tabs-tabbar {
+
+        .mud-tabs-tabbar-inner {
+            .mud-tabs-tabbar-content {
+                .mud-tabs-tabbar-wrapper {
+                    ::after {
+                        transform: translateX(100%);
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .modal-body {
+        overflow-y: auto;
+        ::deep .mud-input-control {
+            .mud-input {
+                .mud-input-slot {
+                    height: Calc(100dvh - 380px);
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 960px) {
+    .modal-body {
+        overflow-y: auto;
+        ::deep .mud-input-control {
+            .mud-input {
+                .mud-input-slot {
+                    height: Calc(100dvh - 380px);
+                }
+            }
+        }
+    }
+}

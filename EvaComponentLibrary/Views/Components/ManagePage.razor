@@ -1,0 +1,53 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+
+
+<SmallPageWrapper>
+	<div class="felx-container">
+		<MudTextField Class="searchbar"
+					  @bind-Value="_search"
+					  Label="@_locals["_search"]"
+					  Immediate="true"
+					  Variant="Variant.Outlined"
+					  Adornment="Adornment.End"
+					  AdornmentIcon="@Icons.Material.Filled.Search"
+					  AdornmentColor="Color.Secondary"
+					  autocomplete="off" />
+		@if (IsLoading && !_vm.SitesSaved.Any())
+		{
+			<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+		}
+		<div class="scroll-list">
+			@if (!_vm.SitesSaved.Any())
+			{
+				<div class="empty">
+					<img src="_content/EvaComponentLibrary/img/box.png" />
+					<p>@_locals["_empty"]</p>
+				</div>
+			}
+			<div class="scroll-content">
+				
+			</div>
+		</div>
+	</div>
+
+</SmallPageWrapper>
+
+
+
+@code{
+	[Parameter]
+	public RenderFragment? ChildContent { get; set; }
+	private string _search = string.Empty;
+	public bool IsLoading;
+
+
+}

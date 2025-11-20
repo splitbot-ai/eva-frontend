@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>PLIST_VERSION</key>
+		<string>1</string>
+		<key>IS_ADS_ENABLED</key>
+		<false/>
+		<key>ANDROID_CLIENT_ID</key>
+		<string>ANDOIRD_CLIENT_ID</string>
+		<key>API_KEY</key>
+		<string>API_KEY</string>
+		<key>GCM_SENDER_ID</key>
+		<string>SENDER_ID</string>
+		<key>BUNDLE_ID</key>
+		<string>PACKAGE_NAME</string>
+		<key>PROJECT_ID</key>
+		<string>PORJECT_ID</string>
+		<key>STORAGE_BUCKET</key>
+		<string>STORAGE_BUCKET</string>
+	</dict>
+</plist>

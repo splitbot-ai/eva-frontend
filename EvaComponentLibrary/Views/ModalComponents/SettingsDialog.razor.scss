@@ -1,0 +1,274 @@
+﻿@import "../styles/light-dark.scss";
+@font-face {
+    font-family: "roboto-light";
+    src: url("/fonts/Roboto-Light.ttf");
+}
+
+@font-face {
+    font-family: "roboto-medium";
+    src: url("/fonts/Roboto-Medium.ttf");
+}
+
+@font-face {
+    font-family: "Roboto-Regular";
+    src: url("/fonts/Roboto-Regular.ttf");
+}
+
+
+@font-face {
+    font-family: "Kanit-Bold";
+    src: url("/fonts/Kanit-Bold.ttf") format('truetype');
+}
+
+.modal {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 100dvw;
+    height: 100dvh;
+    /*background-color: #2222220F;*/
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    top: 0;
+    left: 0;
+    transition: .33s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+
+    .backdrop-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .modal-body {
+        -webkit-box-shadow: 0px 0px 94px -36px rgba(0,0,0,0.79);
+        -moz-box-shadow: 0px 0px 94px -36px rgba(0,0,0,0.79);
+        box-shadow: 0px 0px 94px -36px rgba(0,0,0,0.79);
+        max-width: 540px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 20px;
+        z-index: 11;
+        background-color: var(--primary-color);
+        color: var(--text-color);
+
+        .modal-head {
+            svg {
+                transform: rotate(180deg);
+                cursor: pointer;
+            }
+
+            ::deep .mud-button {
+                color: var(---text-color);
+            }
+
+            ::deep .mud-button-label {
+                gap: 7px;
+                font-family: 'Kanit-Bold';
+                text-transform: uppercase;
+            }
+        }
+
+        .modal-content {
+            margin-top: 20px;
+
+            .headline {
+                padding: 6px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+
+                a {
+                    color: var(--text-color);
+                }
+            }
+
+            .settings-content-container {
+                margin-top: 20px;
+
+                .headline {
+                    font-family: Kanit-Bold;
+                    text-transform: uppercase;
+                }
+
+                ::deep .mud-divider {
+                    opacity: .4;
+                }
+
+                .content-body {
+                    .headline {
+                        a {
+                            font-size: 1.1rem;
+                        }
+
+                        img {
+                            filter: var(--invert0-img);
+                            filter: var(--invert0-img);
+                        }
+                    }
+
+                    .info {
+                        padding: 0px 6px;
+                        font-family: roboto-medium;
+
+                        ::deep.mud-typography {
+                            display: flex;
+                            align-items: center;
+                            column-gap: 5px;
+                        }
+
+                        ::deep.mud-switch-base {
+                            top: 2px;
+                            left: 2px;
+                        }
+
+                        ::deep .mud-info {
+                            background-color: var(--highlight-color) !important;
+                        }
+
+                        ::deep.mud-info-text {
+                            color: #eee !important;
+                        }
+
+                        ::deep.mud-switch-span .mud-switch-track {
+                            background-color: var(--text-color);
+                            border-radius: 15px
+                        }
+
+                        ::deep.mud-switch-span-medium.mud-switch-span {
+                            padding: 8px;
+                        }
+
+                        ::deep.mud-switch-button .mud-switch-thumb-medium {
+                            width: 16px;
+                            height: 16px;
+                        }
+
+                        select {
+                            width: 100%;
+                            padding: 5px;
+                            background-color: var(--secondary-color);
+                            color: var(--text-color);
+                            border-bottom: 1px solid var(--text-color);
+                        }
+
+                        a {
+                            position: relative;
+                            padding: 10px;
+                            background-color: #4381FF;
+                            border-radius: 20px;
+                            float: right;
+                            transform: translateY(-50%);
+                            color: #FFF;
+                            font-family: Kanit-Bold;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.modal.open {
+    display: flex;
+    opacity: 1;
+    pointer-events: all;
+}
+
+
+
+.modal {
+
+
+    .modal-body {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+
+        .modal-head {
+            ::deep .mud-button {
+                color: var(--text-color);
+            }
+        }
+
+        .modal-content {
+
+            .headline {
+                a {
+                    color: var(--text-color);
+                }
+            }
+
+            .settings-content-container {
+
+                .headline {
+                }
+
+
+                ::deep .mud-divider {
+                }
+
+                .content-body {
+                    .headline {
+                        img {
+                            filter: -webkit-invert(0);
+                        }
+                    }
+
+                    .info {
+                        padding: 0px 6px;
+                        font-family: roboto-medium;
+
+                        select {
+                            background-color: var(--primary-color);
+                            color: var(--text-color);
+                            border-bottom: 1px solid var(--primary-color);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .modal {
+        left: 100dvw;
+        background-color: var(--primary-color);
+        .backdrop-container {
+        }
+
+        .modal-body {
+            width: 100dvw;
+            height:100dvh;
+            padding: 10px;
+            border-radius: 0px;
+            z-index: 11;
+
+            
+
+            .modal-content {
+                margin-top: 20px;
+
+                .headline {
+                    padding: 6px;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 20px;
+                }
+            }
+        }
+    }
+    .modal.open {
+        transform: translateX(-100dvw);
+    }
+}
+

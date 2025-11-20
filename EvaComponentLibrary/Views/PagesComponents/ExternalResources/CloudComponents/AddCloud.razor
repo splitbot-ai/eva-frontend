@@ -1,0 +1,72 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Services;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.ViewModels.Cloud
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@inject EMailViewModel _evm;
+@inject CloudBaseViewModel _cbvm;
+@inject WebServices _ws;
+@inject OneDriveViewModel _odvm;
+@inject NextCloudViewModel _ncvm;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject IJSRuntime _js;
+@inject IOpenLinkInBrowser _iopenLink;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject NavigationManager NavigationManager;
+
+
+
+<div class=" main cloud-add-container">
+	<div @onclick="GoToNextcloud" class="cloud-options">
+		<img class="cloud-icon" src="_content/EvaComponentLibrary/img/nextcloud.png" />
+		<h3> NextCloud</h3>
+	</div>
+	@if (_odvm.Info is null)
+	{
+		<div @onclick="GoToOneDirve" class="cloud-options disable">
+			<img class="cloud-icon" src="_content/EvaComponentLibrary/img/onedrive.svg" />
+			<h3> OneDrive</h3>
+		</div>
+		
+	}
+</div>
+
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		base.OnInitialized();
+		_lg.UpdateLanguage += update;
+		
+            await _odvm.GetAllOnedriveAccountsAsync();
+            await _ncvm.GetAllNextCloudAccountsAsync();
+	}
+	private async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+	private void GoToNextcloud()
+	{
+		NavigationManager.NavigateTo("/res/nextcloud/add");
+	}
+	private async Task GoToOneDirve()
+	{
+		try
+		{
+			var result = await _odvm.GetOneDriveAuth();
+			if (!string.IsNullOrEmpty(result) || !result.Equals("Unauthorized", StringComparison.OrdinalIgnoreCase))
+			{
+				_iopenLink.OpenLink(result);
+			}
+		}
+		catch (Exception ex)
+		{
+			//(ex);
+		}
+	}
+}
+

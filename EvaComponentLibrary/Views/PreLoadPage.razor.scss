@@ -1,0 +1,258 @@
+﻿@import "styles/light-dark.scss";
+
+main {
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.name {
+    transform-origin: left;
+    overflow: hidden;
+    width: 0;
+    transition: .5s;
+
+    img {
+        width: 250px;
+    }
+}
+
+.expand {
+    width: 250px !important;
+}
+
+
+
+.head {
+
+
+    img {
+        width: 110px;
+    }
+}
+
+.pulse {
+    animation: blink 1.5s infinite;
+    animation-fill-mode: both;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0
+    }
+
+    50% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+
+
+
+
+@media(max-width:600px){
+    .name{
+        img{
+            width:200px;
+        }
+    }
+    .expand {
+        width: 200px !important;
+    }
+
+    .head {
+        img {
+            width: 90px;
+        }
+    }
+}
+
+    img {
+        filter: var(--invert0-img);
+    }
+    main {
+        background-color: var(--background-color);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*main {
+    width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box {
+    max-width: 500px;
+    width: 100%;
+ 
+}
+.image {
+    transition: .33s;
+    position: relative;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  
+}
+
+.image-head {
+    transition: .33s;
+    position: absolute;
+    height: 123px;
+    top: 0;
+
+    img {
+        height: 100%
+    }
+}
+
+.pulse {
+    animation: blink 1.5s infinite;
+    animation-fill-mode: both;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0
+    }
+
+    50% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+
+.expand1 {
+    transform: translateX(-100%);
+}
+
+.expand {
+    width: 250px !important;
+    transform: translateX(32%) !important;
+}
+
+
+
+.image-name {*/
+/* transform: translateX(32%); */
+
+/*transition: .33s;
+    transform-origin: left;
+    overflow: hidden;
+    width: 0;
+    transition: .33s;
+    img{
+        width: 250px;
+    }*/
+/* width: 250px;*/
+/*}
+
+
+
+
+*/

@@ -1,0 +1,9 @@
+﻿[
+  {
+    "outputFile": "Layout/MainLayout.razor.css",
+    "inputFile": "Layout/MainLayout.razor.scss",
+    "minify": {
+      "enabled": false
+    }
+  }
+]

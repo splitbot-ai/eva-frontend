@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869217859750",
+    "project_id": "Eva-1eae4",
+    "storage_bucket": "Eva-1eae4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869217859750:android:82e4c6ebedfcb034e2dc67",
+        "android_client_info": {
+          "package_name": "com.splitbot.Evamobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJVKRJdnCUxmX1VyEHNFv2ryz71JzyVtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

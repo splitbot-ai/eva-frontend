@@ -1,0 +1,85 @@
+﻿@using EvaComponentLibrary.Languages;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using EvaComponentLibrary.Models;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject ISnackbar Snackbar;
+@inject NavigationManager NavigationManager;
+
+<div class="main web-container">
+    <div class="web-tabs-container">
+        <div class="tabs @(_activeTab ? string.Empty : "activeOne")" @onclick="ToggleActiveTab">
+            <h4>@_locals["_add"]</h4>
+        </div>
+        <div class="tabs  @(_activeTab ? "activeOne" : string.Empty)" @onclick="ToggleActiveTab">
+            <h4>@_locals["_manage"]</h4>
+        </div>
+        <div class="active-tab @(_activeTab ? "active-second" : string.Empty)"></div>
+    </div>
+    <MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty :  "hide-the-info-buttons" )" />
+    <div class="web-content-container ">
+        @ActiveTab
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SubTab { set; get; }
+    private bool _isLoading=false;
+    private bool _activeTab = false;
+    private RenderFragment ActiveTab => (SubTab?.ToLowerInvariant()) switch
+    {
+        "add" => @<AddWeb />,
+        "manage" => @<ManageWeb IsLoading="@_isLoading" />,
+        _ =>  @<AddWeb />
+    };
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        _lg.UpdateLanguage += update;
+    }
+    protected override void OnParametersSet()
+    {
+        _activeTab = (SubTab?.ToLowerInvariant()) switch
+        {
+            "add" => false,
+            "manage" => true,
+            _ => false
+        };
+    }
+    private async void ToggleActiveTab(){
+        _activeTab = !_activeTab;
+        if(_activeTab){
+            NavigationManager.NavigateTo("/res/web/manage");
+            _isLoading = true;
+            await Task.Delay(2000);
+            await _vm.InitWebSave();
+            _isLoading = false;
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }else
+        {
+            NavigationManager.NavigateTo("/res/web/add");
+        }
+    }
+    private async void update()
+    {
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+    private void InfoUploadDialog()
+    {
+        _lg.InfoMessage_1 = _locals["_websitesInfo"];
+        _lg.OnInfoModalToggle = true;
+        _lg.UpdateInfoModal?.Invoke();
+    }
+}

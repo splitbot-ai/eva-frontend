@@ -1,0 +1,268 @@
+﻿@using System.Globalization;
+@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.ViewModels;
+@using EvaComponentLibrary.ViewModels.Cloud;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using Microsoft.Extensions.Options;
+@inject IOptions<HostSettings> _hostSettings;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.Services.WebServices _ws;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.UploadManagerController _uc;
+@inject NextCloudViewModel _nc;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+
+<div class="modal @(Open ? "open" : string.Empty) main">
+    <div @onclick="ToggleOpen" class="backdrop-container"></div>
+    <div class="modal-body">
+        <div class="modal-head">
+            <MudButton OnClick="ToggleOpen">
+                  <svg  class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="img"><title>DoubleArrow</title><!--!--><g><rect fill="none" height="24" width="24"></rect><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20.08,11.42l-4.04-5.65C15.7,5.29,15.15,5,14.56,5h0c-1.49,0-2.35,1.68-1.49,2.89L16,12l-2.93,4.11 c-0.87,1.21,0,2.89,1.49,2.89h0c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C20.33,12.23,20.33,11.77,20.08,11.42z"></path><path d="M13.08,11.42L9.05,5.77C8.7,5.29,8.15,5,7.56,5h0C6.07,5,5.2,6.68,6.07,7.89L9,12l-2.93,4.11C5.2,17.32,6.07,19,7.56,19h0 c0.59,0,1.15-0.29,1.49-0.77l4.04-5.65C13.33,12.23,13.33,11.77,13.08,11.42z"></path></g></g></svg>
+        
+                <h3>@_locals["_settings"]</h3>
+            </MudButton>
+        </div>
+        <div class="modal-content">
+            <div class="headline">
+                <MudAvatar Color="Color.Primary">@(!string.IsNullOrEmpty(UserName) ? UserName[0] : string.Empty)</MudAvatar>
+                <h3>@UserName</h3>
+            </div>
+
+            <div class="settings-content-container">
+                <div class="headline">@_locals["_account"]</div>
+                <MudDivider></MudDivider>
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Mail"></MudIcon>
+                        <h3>Mail</h3>
+                    </div>
+                    <div class="info">
+                        @(!string.IsNullOrEmpty(_ws.UserMail)? _ws.UserMail : string.Empty)
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="headline">
+                        <img style="height: 24px;" src="_content/EvaComponentLibrary/img/brand/brand-icon.svg"/>
+                        <h3>@_locals["_sub"]</h3>
+                    </div>
+                    <div class="info">
+                        @(!string.IsNullOrEmpty(_ws.Sub)? _ws.Sub : string.Empty)
+                       @*  <a href="https://splitbot.de/preise/" target="_blank">@_locals["_about"]</a> *@
+                    </div>
+                </div>                
+            </div>
+
+            <div class="settings-content-container">
+                <div class="headline">App</div>
+                <MudDivider></MudDivider>
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Contrast"></MudIcon>
+                        <h3>@_locals["_colmode"]</h3>
+                    </div>
+                    <div class="info">
+                        <select  name="Farbmodus" id="color" @onchange="ChangeColMode">
+                            @foreach (var colMode in _colMode)
+                            {
+                                if(!string.IsNullOrEmpty(theme) && theme == colMode)
+                                {
+                                    <option selected value="@colMode">@colMode</option> 
+                                }
+                                else
+                                {
+                                    <option value="@colMode">@colMode</option>
+
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Language"></MudIcon>
+                        <h3>@_locals["_lang"]</h3>
+                    </div>
+                    <div class="info">
+                        <select class="form-control" @bind="Culture">
+                            @foreach (var cult in cultures)
+                            {
+                                <option value="@cult">@(cult.Name.StartsWith("de", StringComparison.OrdinalIgnoreCase) ? "Deutsch" : "English")</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Info"></MudIcon>
+                        <h3>@_locals["_infoVisibilityOptions"]</h3>
+                    </div>
+                    <div class="info">
+                        <MudSwitch @bind-Value="_lg.IsInfoButtonHide" @bind-Value:after="Togglevisibility" Label="@(_lg.IsInfoButtonHide ? _locals["_on"] : _locals["_off"])" Color="Color.Info" />
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <div class="settings-content-container">
+                <div class="headline">@_locals["_about"]</div>
+                <MudDivider></MudDivider>
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark"></MudIcon>
+                        <a href="@(_hostSettings.Value.SupportMailTo)">@_locals["_support"]</a>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.PrivacyTip"></MudIcon>
+                        <a href="@(_hostSettings.Value.DsgvoLink)" target="@(Platform.Contains("android") || Platform.Contains("web")? "_blank" : string.Empty)">@_locals["_privacy"]</a>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Fingerprint"></MudIcon>
+                        <a href="@(_hostSettings.Value.Impressum)" target="@(Platform.Contains("android") || Platform.Contains("web")? "_blank" : string.Empty)">@_locals["_imprint"]</a>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.NoAccounts"></MudIcon>
+                        <a href="@(_hostSettings.Value.DeleteAcc)" target="@(Platform.Contains("android") || Platform.Contains("web")? "_blank" : string.Empty)">@_locals["_datadel"]</a>
+                    </div>
+                </div>
+                <div class="content-body">
+                    <div class="headline">
+                        <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Secondary"></MudIcon>
+                        <MudButton OnClick="Logout" Variant="Variant.Text" Color="Color.Secondary">Logout</MudButton>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    [Parameter]
+    public bool Open { get; set; }
+    [Parameter]
+    public string UserName { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+
+    [Parameter]
+    public string Platform { get; set; }
+
+    private bool _isHide = true;
+
+    public string? theme { get; set; }
+
+    private List<string> _colMode = new List<string>() { "System", "dark", "light" };
+
+
+
+    protected override async  Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        string tempo = await _saveManager.GetStringByKeyAsync("hideInfo");
+
+        if (string.IsNullOrEmpty(tempo))
+            tempo = "true";
+
+        bool.TryParse(tempo, out _isHide);
+        _lg.IsInfoButtonHide = _isHide;
+    }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var CurrentCulture = NormalizeCulture(CultureInfo.CurrentCulture.Name);
+        Culture = cultures.FirstOrDefault(c => c.Name == CurrentCulture) ?? cultures[0];
+        theme = _vm.themeMode;
+    }
+
+    private async Task Togglevisibility()
+    {
+        await _saveManager.SaveStringByKeyAsync("hideInfo", $"{_lg.IsInfoButtonHide}");
+    }
+
+    private async void Logout()
+    {
+        bool loggedout = await _vm.LogoutAsync();
+        if(loggedout)
+        {
+            await _saveManager.RemoveRefreshStringByKeyAsync("user");
+            NavigationManager.NavigateTo("/");
+        }
+        _uc.cleanTime();
+        _nc.cleanTime();
+        _vm.cleanTime();
+    }
+
+    private void ToggleOpen()
+    {
+        Open = !Open;
+        OnClose.InvokeAsync(Open);
+        _lg.UpdateLanguage?.Invoke();
+        // _Chat._openSettings = Open;
+    }
+
+    public async void ChangeColMode(ChangeEventArgs e)
+    {
+        string theme = e.Value?.ToString() ?? string.Empty;
+
+        await _jsRuntime.InvokeVoidAsync("changeTheme", e.Value?.ToString());
+        await _saveManager.SaveStringByKeyAsync("colorMode", $"{e.Value}");
+        _vm.ChangeThemeOfSafeArea(theme);
+    }
+
+    public void Update()
+    {
+        StateHasChanged();
+    }
+
+    private string NormalizeCulture(string cultureName)
+    {
+        if (cultureName.StartsWith("en", StringComparison.OrdinalIgnoreCase))
+            return "en-US";
+        if (cultureName.StartsWith("de", StringComparison.OrdinalIgnoreCase))
+            return "de-DE";
+
+        return cultureName;
+    }
+    CultureInfo[] cultures = new[]
+    {
+        new CultureInfo("de-DE"),
+        new CultureInfo("en-US")
+    };
+
+    CultureInfo Culture
+    {
+
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                Thread.CurrentThread.CurrentCulture = value;
+                Thread.CurrentThread.CurrentUICulture = value;
+
+                CultureInfo.DefaultThreadCurrentCulture = value;
+                CultureInfo.DefaultThreadCurrentUICulture = value;
+            }
+        }
+    }
+}

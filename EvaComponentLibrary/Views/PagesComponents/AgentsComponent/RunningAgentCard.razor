@@ -1,0 +1,41 @@
+﻿<div class="running-agent">
+	<div class="agent-type">
+		@Icon
+	</div>
+	<div class="inverted-radius">
+		<div class="header">
+			<div class="name">
+				<h4>
+					@Type
+				</h4>
+				<small>
+					@Lastcheck
+				</small>
+			</div>
+		</div>
+		<div class="body">
+			<h1>
+				@Title
+			</h1>
+
+		</div>
+		<div class="footer">
+			<div class="btn del" @onclick="OnDel">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M16 9v10H8V9zm-1.5-6h-5l-1 1H5v2h14V4h-3.5zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2z" /></svg>
+			</div>
+			<div class="btn edit" @onclick="OnEdit">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2-2.92l9.06-9.06l.92.92L5.92 19H5zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41z" /></svg>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter] public RenderFragment? Icon { get; set; }
+	[Parameter] public RenderFragment? Type { get; set; }
+	[Parameter] public RenderFragment? Title { get; set; }
+	[Parameter] public RenderFragment? Lastcheck { get; set; }
+	[Parameter] public EventCallback<MouseEventArgs> OnEdit { get; set; }
+	[Parameter] public EventCallback<MouseEventArgs> OnDel { get; set; }
+}

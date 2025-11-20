@@ -1,0 +1,158 @@
+﻿@import "../../../styles/light-dark.scss";
+
+
+.header-container {
+    svg{
+        transform: rotate(180deg);
+
+    }
+}
+.body-container {
+    height: 100%;
+    row-gap: 20px;
+    display: flex;
+    flex-direction: column;
+
+    ::deep.search-container {
+        position: relative;
+        width: 100%;
+
+        .input-field {
+            padding: 1rem 1.2rem;
+            font-family: roboto-medium;
+            width: 100%;
+            border-radius: 40px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+
+            &:focus-visible {
+                outline: unset !important;
+            }
+
+            &::-webkit-search-cancel-button {
+                -webkit-appearance: none;
+                width: 18px;
+                height: 18px;
+                margin-right: 6px;
+                cursor: pointer;
+                color: var(--text-color) !important;
+                fill: var(--text-color);
+                background: center/contain no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M18 6L6 18M6 6l12 12'/></svg>");
+            }
+        }
+
+        .normal-btn {
+            float: right;
+            margin-top: 10px;
+            margin-right: 10px;
+            border-radius: 50px;
+            background-color: var(--highlight-color);
+        }
+
+        .mud-button-filled.mud-button-filled-primary {
+        }
+
+        .autocomplete {
+            position: absolute;
+            z-index: 10;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            overflow-y: auto;
+            max-height: 128px;
+            margin-block-start: 5px;
+            margin-block-end: 5px;
+            padding: 10px;
+            padding: 10px;
+            font-size: .9em;
+            font-family: 'roboto-medium';
+
+            ul {
+                list-style-type: none;
+
+                .web-elem {
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    margin: 3px;
+                    width: 100%;
+
+                    &:focus {
+                        border: 2px solid var(--highlight-color);
+                    }
+                }
+            }
+        }
+    }
+
+    .wrapper {
+        height: 100%;
+
+        .list-container {
+            max-height: 300px;
+            height: 100%;
+            overflow-y: auto;
+            background-color: var(--background-color);
+            border-radius: 16px;
+
+            table {
+                border-collapse: collapse;
+                font-family: roboto-medium;
+
+                thead {
+                    text-align: left;
+                    background-color: var(--secondary-color);
+                    border-collapse: collapse;
+                    position: sticky;
+                    top: 0;
+                    z-index: 1;
+                    font-weight: 100;
+
+                    ::deep.select-all {
+
+                        > th:first-child {
+                            padding: 20px 8px;
+                        }
+
+                        .mud-icon-button, th {
+                            color: var(--text-color);
+                        }
+
+                        th .del-btn {
+                            cursor: pointer;
+                            width: 100%;
+                            height: 44px;
+                            padding: 12px;
+                        }
+                    }
+                }
+
+                tbody {
+                    .delete-button {
+                        cursor: pointer;
+                    }
+
+                    tr {
+
+                        > td:first-child {
+                            height: 44px;
+                            width: 44px;
+                        }
+                    }
+                }
+
+                ::deep.mud-icon-button {
+                    color: var(--text-color) !important;
+                }
+            }
+        }
+    }
+}
+.footer-container {
+    .save-btn {
+        width:100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+}

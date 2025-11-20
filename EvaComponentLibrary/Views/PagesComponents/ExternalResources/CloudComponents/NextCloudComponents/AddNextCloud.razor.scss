@@ -1,0 +1,106 @@
+﻿@import"../../../../styles/light-dark.scss";
+
+.main {
+}
+
+.content {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+
+    .nextcloud-content-container {
+        width: 100%;
+        height: calc(100dvh - 280px);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-radius: 20px;
+        padding: 20px 0px;
+
+        ::deep .mud-input-adornment {
+            .mud-icon-button {
+                color: var(--text-color) !important;
+            }
+        }
+
+        ::deep .justify-start {
+            justify-content: center !important;
+        }
+
+        ::deep .mud-paper {
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            border-radius: 20px;
+
+            .mud-button-filled {
+                box-shadow: unset;
+            }
+
+            .mud-button-filled.mud-button-filled-primary {
+                color: #eee;
+                background-color: var(--highlight-color);
+                font-family: "roboto-medium";
+                border-radius: 20px;
+
+                &:hover {
+                    filter: brightness(80%) !important;
+                }
+            }
+
+            .mud-button-filled.mud-button-filled-default {
+                margin-right: 15px;
+                border: 1px solid var(--highlight-color) !important;
+                color: var(--text-color);
+                font-family: "roboto-medium";
+                border-radius: 50px !important;
+
+                &:hover {
+                    filter: brightness(80%) !important;
+                }
+            }
+
+            .mud-input {
+                color: var(--text-color);
+            }
+        }
+    }
+
+    ::deep .mud-elevation-1 {
+        box-shadow: unset !important;
+        font-family: "roboto-medium";
+    }
+
+    ::deep .mud-input-label-inputcontrol {
+        color: var(--text-color) !important;
+        font-family: "roboto-medium";
+    }
+
+    ::deep .mud-input-error:after {
+        color: var(--text-color) !important;
+        font-family: "roboto-medium";
+    }
+
+    ::deep .mud-input-helper-text {
+        color: var(--text-color);
+        font-family: "roboto-medium";
+    }
+
+    ::deep .mud-input-control {
+        .mud-input {
+            .mud-input-adornment-icon {
+                fill: var(--text-color);
+                z-index: 2;
+            }
+
+            .mud-input-slot {
+                color: var(--text-color);
+                opacity: .8;
+                z-index: 2;
+            }
+        }
+    }
+
+    ::deep .mud-typography {
+        font-family: "roboto-medium";
+    }
+}

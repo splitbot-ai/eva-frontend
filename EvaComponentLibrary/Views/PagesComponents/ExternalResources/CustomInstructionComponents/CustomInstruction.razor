@@ -1,0 +1,505 @@
+﻿@using EvaComponentLibrary.Languages;
+@using EvaComponentLibrary.Models;
+@using EvaComponentLibrary.Services;
+@using System.Globalization;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.JSInterop;
+@using Microsoft.Extensions.Options;
+@inject IJSRuntime _jsRuntime;
+@inject IStringLocalizer<MyStrings> _locals;
+@inject Services.SaveStringServices _saveManager;
+@inject EvaComponentLibrary.ViewModels.MainViewModel _vm;
+@inject EvaComponentLibrary.ViewModels.CustomInstViewModel _cvm;
+@inject EvaComponentLibrary.Services.Logistic _lg;
+@inject MySnackBar _sn;
+@implements IDisposable;
+
+<div class=" main custom-instruction-container">
+	<div id="instruction" class="modal-body @(_showInstModal? "hide-page" : string.Empty) @(_showResModal? "hide-page" : string.Empty)">
+		<div class="modal-head" style="@(HideInfo ? string.Empty : "display:none;")">
+@* 			<MudButton OnClick="ToggleOpen">
+				<MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
+				<h3>@_locals["_insts"]</h3>
+			</MudButton> *@
+		</div>
+		<div class="modal-content">
+			<div class="info-btn">
+				<MudIconButton Icon="@Icons.Material.Filled.Info" OnClick="InfoUploadDialog" Size="Size.Small" Color="Color.Primary" Class="@(_lg.IsInfoButtonHide ? string.Empty :  "hide-the-info-buttons" )" />
+			</div>
+			<div class="settings-content-container">
+				<div class="headline">@_locals["_customInst"]</div>
+				<MudDivider></MudDivider>
+				<div class="content-body">
+					<MudButton OnClick="()=>ToggleEditInst(null, null, null)" Variant="Variant.Outlined">
+						<MudIcon Class="rounded-icon" Icon="@Icons.Material.Filled.AddCircleOutline"></MudIcon>
+						@_locals["_addNewInst"]
+					</MudButton>
+
+					<div class="list-container">
+
+						@for (int i = _cvm.CunstInstsList.CunstInst.Count - 1; i >= 0; i--)
+						{
+							var index = i;
+
+
+							<input type="radio" name="customInst" value="@index" id="instruction_@index" checked="@(index == _cvm.CunstInstsList.InstIndex)" @onchange="() => _cvm.SetInstIndex(index)" />
+							<div class="item">
+
+								<label for="instruction_@index">
+									<span> </span>
+								</label>
+								<div class="content">
+									<p>
+										@if (string.IsNullOrEmpty(_cvm.CunstInstsList.CunstInst[index].Title))
+										{
+											@_cvm.CunstInstsList.CunstInst[index].Inst
+										}
+										else
+										{
+											@_cvm.CunstInstsList.CunstInst[index].Title
+										}
+									</p>
+									<MudFab OnClick="()=>ToggleEditInst(_cvm.CunstInstsList.CunstInst[index].Title, _cvm.CunstInstsList.CunstInst[index].Inst,index)" Size="Size.Medium" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" />
+									<MudFab OnClick="() => RemoveCunstInst(index)" Size="Size.Medium" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Delete" />
+								</div>
+							</div>
+						}
+
+
+					</div>
+				</div>
+
+				<div class="headline">@_locals["_resBehaviour"]</div>
+				<MudDivider></MudDivider>
+				<div class="content-body">
+					<MudButton OnClick="() => ToggleEditRes(null, null, null)" Variant="Variant.Outlined">
+						<MudIcon Class="rounded-icon" Icon="@Icons.Material.Filled.AddCircleOutline"></MudIcon>
+						@_locals["_addNewRes"]
+					</MudButton>
+					<div class="list-container">
+						@for (int i = _cvm.CunstInstsList.CunstRes.Count - 1; i >= 0; i--)
+						{
+							var index = i;
+
+
+							<input type="radio" name="resBehaviour" value="" id="response_@index" checked="@(index == _cvm.CunstInstsList.ResIndex)" @onchange="() => _cvm.SetResIndex(index)" />
+							<div class="item">
+
+								<label class="label" for="response_@index">
+									<span></span>
+								</label>
+								<div class="content">
+									<p>
+										@if (string.IsNullOrEmpty(_cvm.CunstInstsList.CunstRes[index].Title))
+										{
+											@_cvm.CunstInstsList.CunstRes[index].Resp
+										}
+										else
+										{
+											@_cvm.CunstInstsList.CunstRes[index].Title
+										}
+
+									</p>
+									<MudFab OnClick="()=>ToggleEditRes(_cvm.CunstInstsList.CunstRes[index].Title, _cvm.CunstInstsList.CunstRes[index].Resp,index)" Size="Size.Medium" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" />
+									<MudFab OnClick="() => RemoveCunstRes(index)" Size="Size.Medium" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Delete" />
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="instruction-footer">
+		</div>
+	</div>
+
+
+	<div id="editInst" class="modal-body @(!_showInstModal? "hide-page" : string.Empty)">
+		<div class="modal-head ">
+		</div>
+		<div class="modal-content">
+			<div class="settings-content-container">
+				<div class="headline"><h3>@_locals["_customInst"]</h3></div>
+				<MudDivider></MudDivider>
+				<div class="title">
+					<h4>@_locals["_headline"]</h4>
+
+				</div>
+				<div Class="headline-input">
+					<MudTextField T="string" @bind-Value="_headline" Underline="false" Variant="Variant.Filled" Lines="1" />
+				</div>
+				<div class="content-body">
+					<div class="title">
+						<h4>@_locals["_description"]</h4>
+
+					</div>
+					<MudTextField T="string" @bind-Value="_cunstInst" Underline="false" Variant="Variant.Filled" Lines="3" />
+				</div>
+			</div>
+		</div>
+		<div class="modal-foot ">
+			<MudButton OnClick="() => ToggleEditInst(null, null,null)" Variant="Variant.Filled">@_locals["_cancel"]</MudButton>
+			<MudButton OnClick="AddNewOrEditInst" Variant="Variant.Filled" Color="Color.Primary">@if (Index == null)
+				{
+					@_locals["_add"]
+				}
+				else
+				{
+					@_locals["_edit"]
+				}</MudButton>
+			</div>
+		</div>
+		@* ------------------------------------------------------------------------------------------------------------------------------------ *@
+		<div id="editRes" class="modal-body  @(!_showResModal? "hide-page" : string.Empty)">
+			<div class="modal-head ">
+			</div>
+
+			<div class="modal-content">
+				<div class="settings-content-container">
+					<div class="headline"><h3>@_locals["_resBehaviour"]</h3></div>
+					<MudDivider></MudDivider>
+					<div class="title">
+						<h4>@_locals["_headline"]</h4>
+
+					</div>
+					<div Class="headline-input">
+						<MudTextField T="string" @bind-Value="_headline" Underline="false" Variant="Variant.Filled" Lines="1" />
+					</div>
+					<div class="content-body">
+						<div class="title">
+							<h4>@_locals["_description"]</h4>
+
+						</div>
+						<MudTextField T="string" @bind-Value="_cunstRes" Underline="false" Variant="Variant.Filled" Lines="3" />
+					</div>
+				</div>
+			</div>
+			<div class="modal-foot ">
+				<MudButton OnClick="()=> ToggleEditRes(null, null,null)" Variant="Variant.Filled">@_locals["_cancel"]</MudButton>
+				<MudButton OnClick="AddNewOrEditRes" Variant="Variant.Filled" Color="Color.Primary">
+					@if (Index == null)
+				{
+					@_locals["_add"]
+				}
+				else
+				{
+					@_locals["_save"]
+				}
+			</MudButton>
+		</div>
+	</div>
+</div>
+
+
+@code {
+
+
+
+	[Parameter]
+	public bool Open { get; set; }
+	[Parameter]
+	public EventCallback<bool> OnClose { get; set; }
+	[Parameter]
+	public bool HideInfo { get; set; }
+	[Parameter]
+	public string SubTab { get; set; }
+
+	private static string _defaultInst = "Du bist ein von der Splitbot GmbH entwickelter KI - Assistent. Die Splitbot GmbH mit Sitz in Lübeck ist ein 2023 von Tadeusz Nikitin gegründetes Startup. Deine Aufgabe ist es bei den täglichen Aufgaben im Büro und Verwaltung sinnvoll zu helfen.";
+
+	private static string _defaultRes = "Formuliere die Antwort in deutscher Sprache.";
+
+	private string? _cunstInst = _defaultInst;
+
+	private string? _cunstRes = _defaultRes;
+
+	public int? Index { get; set; }
+
+	public string? theme { get; set; }
+
+	private bool _showInstModal { get; set; } = false;
+
+	private bool _showResModal { get; set; } = false;
+
+	private List<string> _colMode = new List<string>() { "System", "dark", "light" };
+
+	private bool _openInfo;
+
+	private string _infoMessage = string.Empty;
+
+	private string _infoMessageSecond = string.Empty;
+
+	private string _headline;
+
+
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		_cvm.UpdateUi += StateHasChanged;
+		_cvm.RemoveResult += RemoveInstUndResAlert;
+		_cvm.AddResult += AddNewInsUndResAlert;
+		_cvm.EditResult += EditInstUndResAlert;
+		_cvm.SetIndexResult += SetIndexOfInstUndResAlert;
+		_lg.UpdateLanguage += update;
+		theme = _vm.themeMode;
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		await _cvm.GetInstAsync();
+
+	}
+	private void InfoModalHandler(bool open)
+	{
+		_openInfo = open;
+	}
+
+	private void ToggleInfo()
+	{
+		_openInfo = !_openInfo;
+	}
+
+	private void ToggleOpen()
+	{
+		Open = !Open;
+		OnClose.InvokeAsync(Open);
+		// _Chat._openSettings = Open;
+	}
+
+	public async void ChangeColMode(ChangeEventArgs e)
+	{
+		await _jsRuntime.InvokeVoidAsync("changeTheme", e.Value?.ToString());
+		await _saveManager.SaveStringByKeyAsync("colorMode", $"{e.Value}");
+	}
+
+
+	public async void update()
+	{
+		await InvokeAsync(() =>
+		{
+			StateHasChanged();
+		});
+	}
+
+
+	private async Task AddNewOrEditInst()
+	{
+		bool isSucc = await _cvm.AddNewOrEditInst(_headline, _cunstInst, Index);
+		if (isSucc)
+		{
+			//("true");
+		}
+		//("false");
+		Index = null;
+		ToggleEditInst(null, null, null);
+		update();
+
+
+	}
+	private async Task AddNewOrEditRes()
+	{
+		bool isSucc = await _cvm.AddNewOrEditRes(_headline, _cunstRes, Index);
+		if (isSucc)
+		{
+			//("true");
+		}
+		//("false");
+		Index = null;
+		ToggleEditRes(null, null, null);
+		update();
+
+
+	}
+
+
+	private async Task RemoveCunstInst(int index)
+	{
+		bool isSucc = await _cvm.RemoveCunstInst(index);
+
+		if (isSucc)
+		{
+
+			Console.WriteLine("true");
+			update();
+		}
+
+		//("false");
+	}
+
+	private async Task RemoveCunstRes(int index)
+	{
+		bool isSucc = await _cvm.RemoveCunstRes(index);
+
+		if (isSucc)
+		{
+
+			Console.WriteLine("true");
+			update();
+		}
+
+		//("false");
+	}
+
+	private void ToggleEditRes(string? headline, string? text, int? index)
+	{
+		if (text != null)
+		{
+
+			_cunstRes = text;
+			Index = index;
+			_headline = headline;
+			_showResModal = !_showResModal;
+
+		}
+		else
+		{
+
+			_showResModal = !_showResModal;
+			_cunstRes = string.Empty;
+			_headline = string.Empty;
+			Index = null;
+		}
+	}
+
+	private void ToggleEditInst(string? headline, string? text, int? index)
+	{
+		if (text != null)
+		{
+			_cunstInst = text;
+			Index = index;
+			_headline = headline;
+			_showInstModal = !_showInstModal;
+		}
+		else
+		{
+
+			_showInstModal = !_showInstModal;
+			_cunstInst = string.Empty;
+			_headline = string.Empty;
+			Index = null;
+		}
+	}
+
+	private async Task PutInstAsync()
+	{
+
+		await _cvm.PutInstAsync();
+	}
+
+	void AddNewInsUndResAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+			_sn.PoPSnackBar(string.Format(_locals["_succUpload"], string.Empty), Severity.Success);
+		}
+		if (isSucc == false)
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+		}
+	}
+
+	void RemoveInstUndResAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+			_sn.PoPSnackBar(_locals["_succDelete"], Severity.Success);
+		}
+		if (isSucc == false)
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+		}
+	}
+
+	void EditInstUndResAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+			_sn.PoPSnackBar(_locals["_succEdite"], Severity.Success);
+		}
+		if (isSucc == false)
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+		}
+	}
+	void SetIndexOfInstUndResAlert(bool isSucc)
+	{
+		if (isSucc == true)
+		{
+			string message = _locals["_succSelect"];
+
+			// Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+			// Snackbar.Add(message, Severity.Success, config =>
+			// {
+			// 	config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Allow;
+			// 	config.VisibleStateDuration = 1500;
+
+			// 	config.SnackbarVariant = Variant.Filled;
+			// 	config.CloseAfterNavigation = true;
+			// 	config.ShowCloseIcon = false;
+
+			// });
+
+
+			
+		}
+		if (isSucc == false)
+		{
+			_sn.PoPSnackBar(_locals["_genError"], Severity.Error);
+		}
+	}
+
+	[Inject]
+	private IOptions<HostSettings> _hostSettings { get; set; }
+	private void InfoInst()
+	{
+		_infoMessage = string.Format(_locals["_StandardanweisungenInfo"], _hostSettings?.Value.Brandname);
+		_infoMessageSecond = string.Format(_locals["_antwortverhaltenInfo"], _hostSettings?.Value.Brandname);
+		ToggleInfo();
+
+	}
+
+
+
+
+
+	CultureInfo[] cultures = new[]
+	{
+		new CultureInfo("en-US"),
+		new CultureInfo("de-DE")
+	};
+
+	CultureInfo Culture
+	{
+
+		get => CultureInfo.CurrentCulture;
+		set
+		{
+			if (CultureInfo.CurrentCulture != value)
+			{
+				Thread.CurrentThread.CurrentCulture = value;
+				Thread.CurrentThread.CurrentUICulture = value;
+
+				CultureInfo.DefaultThreadCurrentCulture = value;
+				CultureInfo.DefaultThreadCurrentUICulture = value;
+				StateHasChanged();
+			}
+		}
+	}
+	private void InfoUploadDialog()
+	{
+		_lg.InfoMessage_1 = string.Format(_locals["_StandardanweisungenInfo"], _hostSettings?.Value.Brandname);
+		_lg.InfoMessage_2 = string.Format(_locals["_antwortverhaltenInfo"], _hostSettings?.Value.Brandname);
+		_lg.OnInfoModalToggle = true;
+		_lg.UpdateInfoModal?.Invoke();
+	}
+	public void Dispose()
+	{
+		_cvm.UpdateUi -= StateHasChanged;
+		_cvm.RemoveResult -= RemoveInstUndResAlert;
+		_cvm.AddResult -= AddNewInsUndResAlert;
+		_cvm.EditResult -= EditInstUndResAlert;
+		_cvm.SetIndexResult -= SetIndexOfInstUndResAlert;
+		_lg.UpdateLanguage -= update;
+	}
+}

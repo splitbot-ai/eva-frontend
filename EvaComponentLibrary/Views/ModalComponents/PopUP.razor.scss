@@ -1,0 +1,91 @@
+﻿@import "../styles/light-dark.scss";
+@import "../styles/modal-style.scss";
+
+
+
+.modal-head {
+
+	::deep .mud-icon-button {
+		padding: 0;
+		padding-left: 10px;
+		color: var(--text-color) !important;
+	}
+
+	::deep .mud-button-label {
+		gap: 7px;
+		font-family: 'Kanit-Bold';
+		text-transform: uppercase;
+	}
+}
+.modal-content {
+	margin-top: 0 !important;
+
+	.body {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		padding: 10px;
+		justify-content: space-between;
+
+		.message {
+			display: flex;
+			font-size: 15px;
+			font-family: 'roboto-medium';
+			row-gap: 10px;
+			flex-direction: column;
+			border-top: 3px solid var(--highlight-color);
+			padding: 20px 10px;
+			overflow-y: auto;
+
+			.list {
+				overflow-y: auto;
+
+				ul {
+					display: flex;
+					list-style: inside;
+					flex-direction: column;
+					row-gap: 5px;
+
+					p {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						width: 90%;
+					}
+				}
+			}
+		}
+
+
+		.footer {
+			display: flex;
+			justify-content: flex-end;
+			margin-top: auto;
+			margin-bottom: 15px;
+			margin-bottom: 40px;
+
+			::deep .mud-button-filled-default {
+				margin-right: 15px;
+				border: 1px solid var(--highlight-color) !important;
+				color: var(--text-color);
+				border-radius: 50px !important;
+
+				&:hover {
+					filter: brightness(80%);
+				}
+			}
+
+			::deep .mud-button-filled-primary {
+				color: white;
+				background-color: var(--highlight-color);
+				border-radius: 50px !important;
+
+				&:hover {
+					filter: brightness(80%);
+				}
+			}
+		}
+	}
+}
+
+

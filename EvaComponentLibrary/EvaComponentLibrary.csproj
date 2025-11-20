@@ -1,0 +1,135 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+	
+	<PropertyGroup Condition="'$(Brand)' == '' And $([System.String]::Copy($(Configuration)).Contains('-'))">
+		<Brand>$([System.String]::Copy($(Configuration)).Split('-')[1])</Brand>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- rekursiv *alle* Dateien des aktuell gewählten Brands -->
+		<BrandFiles Include="AssetsForWhiteLabel\$(Brand)\**\*.*" />
+	</ItemGroup>
+
+	<Target Name="ApplyBrandAssets" BeforeTargets="BeforeBuild">
+		<Message Importance="high" Text="Branding: $(Brand) – kopiere %(BrandFiles.Count) Dateien" />
+		<Copy SourceFiles="@(BrandFiles)" DestinationFiles="@(BrandFiles -> '%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
+	
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Configurations>Release-Eva;Debug-Eva;</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+    <Content Remove="Views\styles\Crawler.razor" />
+    <Content Remove="wwwroot\js\resizechatwindow.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="AssetsForWhiteLabel\Eva\wwwroot\img\gradient-text.svg" />
+    <None Remove="AssetsForWhiteLabel\Eva\wwwroot\img\Eva-hands.png" />
+    <None Remove="AssetsForWhiteLabel\Eva\wwwroot\img\Eva-head.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SassFile Remove="Views\CustomInstruction.razor.scss" />
+    <SassFile Remove="Views\Layout\MainLayout.razor.scss" />
+    <SassFile Remove="Views\NextCloud.razor.scss" />
+    <SassFile Remove="Views\PagesComponents\AgentsComponent\AgentCard.razor.scss" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DartSassBuilder" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
+    <PackageReference Include="MudBlazor" Version="8.12.0" />
+    <PackageReference Include="MudBlazor.Markdown" Version="8.11.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+  </ItemGroup>
+
+
+
+	
+
+
+	
+	<ItemGroup>
+    <None Include="compilerconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="Views\Layout\LibMainLayout.razor.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\styles\Crawler.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\styles\Crawler.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\img\gradient-text.svg" />
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\img\Eva-hands.png" />
+    <Content Include="AssetsForWhiteLabel\Eva\wwwroot\img\Eva-head.png" />
+    <Content Include="Views\PagesComponents\AgentsComponent\CardAgent.razor.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AssetsForWhiteLabel\Inoria\wwwroot\img\" />
+    <Folder Include="wwwroot\img\brand\" />
+    <Folder Include="wwwroot\pdf\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Content Update="wwwroot\pdf-viewer\**\*">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Languages\ErrorMessage.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>ErrorMessage.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Languages\ErrorMessage.de.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Languages\ErrorMessage.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>ErrorMessage.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="DoNotLinkWithBrowserEngineKit" AfterTargets="_ComputeLinkNativeExecutableInputs">
+		<ItemGroup>
+			<_NativeExecutableFrameworks Remove="BrowserEngineKit" />
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
+		<DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+	</PropertyGroup>
+</Project>

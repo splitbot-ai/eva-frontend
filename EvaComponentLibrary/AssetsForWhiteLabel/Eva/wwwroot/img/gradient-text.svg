@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 686.61 22.43">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Unbenannter_Verlauf_62-2);
+      }
+
+      .cls-2 {
+        fill: url(#Unbenannter_Verlauf_62);
+      }
+    </style>
+    <linearGradient id="Unbenannter_Verlauf_62" data-name="Unbenannter Verlauf 62" x1="0" y1="11.22" x2="343.3" y2="11.22" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2ecc71"/>
+      <stop offset=".35" stop-color="#f39c12"/>
+      <stop offset=".7" stop-color="#3498db"/>
+      <stop offset="1" stop-color="#9b59b6"/>
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_62-2" data-name="Unbenannter Verlauf 62" x1="-142.43" y1="45.03" x2="200.87" y2="45.03" gradientTransform="translate(485.74 -33.82)" xlink:href="#Unbenannter_Verlauf_62"/>
+  </defs>
+  <g id="Ebene_1-2" data-name="Ebene_1">
+    <g>
+      <rect class="cls-2" width="343.3" height="22.43"/>
+      <rect class="cls-1" x="343.3" width="343.3" height="22.43" transform="translate(1029.91 22.43) rotate(180)"/>
+    </g>
+  </g>
+</svg>

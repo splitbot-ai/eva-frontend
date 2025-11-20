@@ -1,0 +1,26 @@
+﻿<Project>
+	
+	
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="AssetsForWhiteLabel\$(Brand)\Resources\AppIcon\appicon.svg" ForegroundFile="AssetsForWhiteLabel\$(Brand)\Resources\AppIcon\appiconfg.svg" Color="#111111"/>
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="AssetsForWhiteLabel\$(Brand)\Resources\Splash\splash_screen.svg" Color="#1111ff" BaseSize="128,128" />
+
+		<!-- Images -->
+		<MauiImage Include="AssetsForWhiteLabel\$(Brand)\Resources\Images\*" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="AssetsForWhiteLabel\$(Brand)\Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="AssetsForWhiteLabel\$(Brand)\Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<ApplicationTitle>Eva</ApplicationTitle>
+	</PropertyGroup>
+
+
+</Project>
